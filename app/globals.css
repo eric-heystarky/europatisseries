@@ -1,26 +1,112 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ── Euro Patisserie Armadale — brutalist theme ───────────────────────────
+   Navy (#050930) on light icy-blue. Sharp edges, heavy borders, uppercase. */
+@theme {
+  --color-background: hsl(231 40% 93%);
+  --color-foreground: hsl(234 81% 10%);
+  --color-card: hsl(231 40% 96%);
+  --color-card-foreground: hsl(234 81% 10%);
+  --color-primary: hsl(234 81% 10%);
+  --color-primary-foreground: hsl(231 40% 96%);
+  --color-secondary: hsl(231 42% 85%);
+  --color-muted: hsl(231 42% 85%);
+  --color-muted-foreground: hsl(234 30% 38%);
+  --color-accent: hsl(231 42% 85%);
+  --color-border: hsl(234 81% 10%);
+
+  --radius: 0rem;
+
+  --font-sans: var(--font-faro), system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), Georgia, serif;
+  --font-display: var(--font-shorelines), cursive;
+
+  --animate-marquee: marquee 25s linear infinite;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+}
+
+@layer components {
+  /* Signature brutalist buttons: sharp, bordered, lift-on-hover offset shadow. */
+  .btn-brutal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 2px solid var(--color-primary);
+    background: var(--color-primary);
+    color: var(--color-primary-foreground);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+    border-radius: 0;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease,
+      color 0.15s ease;
+  }
+  .btn-brutal:hover:not(:disabled) {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 0 var(--color-primary);
+  }
+  .btn-brutal:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .btn-brutal-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 2px solid var(--color-primary);
+    background: transparent;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+    border-radius: 0;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease,
+      color 0.15s ease;
+  }
+  .btn-brutal-outline:hover:not(:disabled) {
+    background: var(--color-primary);
+    color: var(--color-primary-foreground);
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 0 var(--color-primary);
+  }
+  .btn-brutal-outline:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* Brutalist form field. */
+  .field-brutal {
+    width: 100%;
+    border: 2px solid var(--color-primary);
+    background: var(--color-card);
+    border-radius: 0;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+    outline: none;
+  }
+  .field-brutal:focus {
+    box-shadow: 3px 3px 0 0 var(--color-primary);
+  }
 }
