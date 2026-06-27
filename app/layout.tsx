@@ -1,16 +1,22 @@
 import type { Metadata } from "next";
-import { Karla, Fraunces, Parisienne } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { CartProvider } from "@/components/cart-context";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { CartDrawer } from "@/components/cart-drawer";
 
-// Stand-ins for the site's custom faces (Faro / Shorelines) until the real
-// woff2 files are supplied: Karla ≈ Faro (body), Parisienne ≈ Shorelines (script).
-const faro = Karla({ variable: "--font-faro", subsets: ["latin"], weight: ["400", "700", "800"] });
-const fraunces = Fraunces({ variable: "--font-fraunces", subsets: ["latin"] });
-const shorelines = Parisienne({ variable: "--font-shorelines", subsets: ["latin"], weight: "400" });
+// The brand's own faces. Faro for body/headings, Shorelines for script display.
+const faro = localFont({
+  src: "./fonts/faro-display-lucky.woff2",
+  variable: "--font-faro",
+  display: "swap",
+});
+const shorelines = localFont({
+  src: "./fonts/shorelines-script-bold.woff",
+  variable: "--font-shorelines",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Euro Patisserie Armadale — Order Online",
@@ -25,7 +31,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${faro.variable} ${fraunces.variable} ${shorelines.variable} h-full antialiased`}
+      className={`${faro.variable} ${shorelines.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <CartProvider>

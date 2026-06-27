@@ -18,7 +18,7 @@
   --radius: 0rem;
 
   --font-sans: var(--font-faro), system-ui, sans-serif;
-  --font-serif: var(--font-fraunces), Georgia, serif;
+  --font-serif: var(--font-faro), Georgia, serif;
   --font-display: var(--font-shorelines), cursive;
 
   --animate-marquee: marquee 25s linear infinite;
