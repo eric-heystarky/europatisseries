@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  @font-face {
+    font-family: 'Faro';
+    src: url('https://vibe.filesafe.space/1782359074813107391/assets/a4c810d3-c6e7-420d-8f1d-c093d2c77a0f.png') format('woff2');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Shorelines';
+    src: url('https://vibe.filesafe.space/1782359074813107391/assets/77ee3895-daf3-4733-841f-14392780fb03.png');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --background: 231 40% 93%; /* Light icy blue */
+    --foreground: 234 81% 10%; /* #050930 */
+
+    --card: 231 40% 96%;
+    --card-foreground: 234 81% 10%;
+
+    --popover: 231 40% 96%;
+    --popover-foreground: 234 81% 10%;
+
+    --primary: 234 81% 10%; /* #050930 */
+    --primary-foreground: 231 40% 96%;
+
+    --secondary: 231 42% 85%; /* Muted blue */
+    --secondary-foreground: 234 81% 10%;
+
+    --muted: 231 42% 85%;
+    --muted-foreground: 234 40% 40%;
+
+    --accent: 231 42% 85%;
+    --accent-foreground: 234 81% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 234 81% 10%; /* Dark borders for brutalist look */
+    --input: 234 81% 10%;
+    --ring: 234 81% 10%;
+
+    --radius: 0rem; /* Sharp edges for brutalist feel */
+
+    --sidebar-background: 231 40% 93%;
+    --sidebar-foreground: 234 81% 10%;
+    --sidebar-primary: 234 81% 10%;
+    --sidebar-primary-foreground: 231 40% 96%;
+    --sidebar-accent: 231 42% 85%;
+    --sidebar-accent-foreground: 234 81% 10%;
+    --sidebar-border: 234 81% 10%;
+    --sidebar-ring: 234 81% 10%;
+  }
+
+  .dark {
+    --background: 234 81% 10%; /* #050930 */
+    --foreground: 231 40% 93%;
+
+    --card: 234 81% 12%;
+    --card-foreground: 231 40% 93%;
+
+    --popover: 234 81% 10%;
+    --popover-foreground: 231 40% 93%;
+
+    --primary: 231 40% 93%;
+    --primary-foreground: 234 81% 10%;
+
+    --secondary: 234 60% 20%;
+    --secondary-foreground: 231 40% 93%;
+
+    --muted: 234 60% 20%;
+    --muted-foreground: 231 30% 70%;
+
+    --accent: 234 60% 20%;
+    --accent-foreground: 231 40% 93%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 231 40% 93%;
+
+    --border: 231 40% 93%;
+    --input: 231 40% 93%;
+    --ring: 231 40% 93%;
+    
+    --sidebar-background: 234 81% 10%;
+    --sidebar-foreground: 231 40% 93%;
+    --sidebar-primary: 231 40% 93%;
+    --sidebar-primary-foreground: 234 81% 10%;
+    --sidebar-accent: 234 60% 20%;
+    --sidebar-accent-foreground: 231 40% 93%;
+    --sidebar-border: 231 40% 93%;
+    --sidebar-ring: 231 40% 93%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
