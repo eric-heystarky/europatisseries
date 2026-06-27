@@ -72,6 +72,7 @@ export function ItemDialog({ item, currency, onClose }: Props) {
         variationName: variation.name,
         basePriceCents: variation.priceCents,
         modifiers: chosenModifiers,
+        imageUrl: item.imageUrl ?? undefined,
       },
       quantity,
     );

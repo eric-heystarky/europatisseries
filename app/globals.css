@@ -1,47 +1,111 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* ── Euro Patisserie Armadale — brutalist theme ───────────────────────────
-   Navy (#050930) on light icy-blue. Sharp edges, heavy borders, uppercase. */
-@theme {
-  --color-background: hsl(231 40% 93%);
-  --color-foreground: hsl(234 81% 10%);
-  --color-card: hsl(231 40% 96%);
-  --color-card-foreground: hsl(234 81% 10%);
-  --color-primary: hsl(234 81% 10%);
-  --color-primary-foreground: hsl(231 40% 96%);
-  --color-secondary: hsl(231 42% 85%);
-  --color-muted: hsl(231 42% 85%);
-  --color-muted-foreground: hsl(234 30% 38%);
-  --color-accent: hsl(231 42% 85%);
-  --color-border: hsl(234 81% 10%);
+   Navy (#050930) on light icy-blue. Sharp edges, heavy borders, uppercase.
+   All colours are HSL channels so shadcn/ui's hsl(var(--token)) pattern works.
+   Brand faces (Faro, Shorelines) are loaded via next/font/local in layout.tsx. */
+@layer base {
+  :root {
+    --background: 231 40% 93%; /* Light icy blue */
+    --foreground: 234 81% 10%; /* #050930 */
 
-  --radius: 0rem;
+    --card: 231 40% 96%;
+    --card-foreground: 234 81% 10%;
 
-  --font-sans: var(--font-faro), system-ui, sans-serif;
-  --font-serif: var(--font-faro), Georgia, serif;
-  --font-display: var(--font-shorelines), cursive;
+    --popover: 231 40% 96%;
+    --popover-foreground: 234 81% 10%;
 
-  --animate-marquee: marquee 25s linear infinite;
-}
+    --primary: 234 81% 10%; /* #050930 */
+    --primary-foreground: 231 40% 96%;
 
-@keyframes marquee {
-  from {
-    transform: translateX(0);
+    --secondary: 231 42% 85%; /* Muted blue */
+    --secondary-foreground: 234 81% 10%;
+
+    --muted: 231 42% 85%;
+    --muted-foreground: 234 40% 40%;
+
+    --accent: 231 42% 85%;
+    --accent-foreground: 234 81% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 234 81% 10%; /* Dark borders for brutalist look */
+    --input: 234 81% 10%;
+    --ring: 234 81% 10%;
+
+    --radius: 0rem; /* Sharp edges for brutalist feel */
+
+    --sidebar-background: 231 40% 93%;
+    --sidebar-foreground: 234 81% 10%;
+    --sidebar-primary: 234 81% 10%;
+    --sidebar-primary-foreground: 231 40% 96%;
+    --sidebar-accent: 231 42% 85%;
+    --sidebar-accent-foreground: 234 81% 10%;
+    --sidebar-border: 234 81% 10%;
+    --sidebar-ring: 234 81% 10%;
   }
-  to {
-    transform: translateX(-50%);
+
+  .dark {
+    --background: 234 81% 10%; /* #050930 */
+    --foreground: 231 40% 93%;
+
+    --card: 234 81% 12%;
+    --card-foreground: 231 40% 93%;
+
+    --popover: 234 81% 10%;
+    --popover-foreground: 231 40% 93%;
+
+    --primary: 231 40% 93%;
+    --primary-foreground: 234 81% 10%;
+
+    --secondary: 234 60% 20%;
+    --secondary-foreground: 231 40% 93%;
+
+    --muted: 234 60% 20%;
+    --muted-foreground: 231 30% 70%;
+
+    --accent: 234 60% 20%;
+    --accent-foreground: 231 40% 93%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 231 40% 93%;
+
+    --border: 231 40% 93%;
+    --input: 231 40% 93%;
+    --ring: 231 40% 93%;
+
+    --sidebar-background: 234 81% 10%;
+    --sidebar-foreground: 231 40% 93%;
+    --sidebar-primary: 231 40% 93%;
+    --sidebar-primary-foreground: 234 81% 10%;
+    --sidebar-accent: 234 60% 20%;
+    --sidebar-accent-foreground: 231 40% 93%;
+    --sidebar-border: 231 40% 93%;
+    --sidebar-ring: 231 40% 93%;
   }
 }
 
-body {
-  background: var(--color-background);
-  color: var(--color-foreground);
-  font-family: var(--font-sans);
-}
+@layer base {
+  * {
+    @apply border-border;
+  }
 
-::selection {
-  background: var(--color-primary);
-  color: var(--color-primary-foreground);
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-faro), system-ui, sans-serif;
+  }
+
+  ::selection {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
 }
 
 @layer components {
@@ -51,9 +115,9 @@ body {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    border: 2px solid var(--color-primary);
-    background: var(--color-primary);
-    color: var(--color-primary-foreground);
+    border: 2px solid hsl(var(--primary));
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
     text-transform: uppercase;
     letter-spacing: 0.12em;
     font-weight: 700;
@@ -63,7 +127,7 @@ body {
   }
   .btn-brutal:hover:not(:disabled) {
     transform: translate(-2px, -2px);
-    box-shadow: 4px 4px 0 0 var(--color-primary);
+    box-shadow: 4px 4px 0 0 hsl(var(--primary));
   }
   .btn-brutal:disabled {
     opacity: 0.4;
@@ -75,9 +139,9 @@ body {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    border: 2px solid var(--color-primary);
+    border: 2px solid hsl(var(--primary));
     background: transparent;
-    color: var(--color-primary);
+    color: hsl(var(--primary));
     text-transform: uppercase;
     letter-spacing: 0.12em;
     font-weight: 700;
@@ -86,10 +150,10 @@ body {
       color 0.15s ease;
   }
   .btn-brutal-outline:hover:not(:disabled) {
-    background: var(--color-primary);
-    color: var(--color-primary-foreground);
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
     transform: translate(-2px, -2px);
-    box-shadow: 4px 4px 0 0 var(--color-primary);
+    box-shadow: 4px 4px 0 0 hsl(var(--primary));
   }
   .btn-brutal-outline:disabled {
     opacity: 0.4;
@@ -99,14 +163,14 @@ body {
   /* Brutalist form field. */
   .field-brutal {
     width: 100%;
-    border: 2px solid var(--color-primary);
-    background: var(--color-card);
+    border: 2px solid hsl(var(--primary));
+    background: hsl(var(--card));
     border-radius: 0;
     padding: 0.625rem 0.75rem;
     font-size: 0.875rem;
     outline: none;
   }
   .field-brutal:focus {
-    box-shadow: 3px 3px 0 0 var(--color-primary);
+    box-shadow: 3px 3px 0 0 hsl(var(--primary));
   }
 }

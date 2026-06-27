@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { Search, X } from "lucide-react";
 import type { Menu, MenuItem } from "@/lib/menu";
 import { formatPrice, slugify } from "@/lib/format";
 import { useCart } from "./cart-context";
@@ -8,7 +9,30 @@ import { ItemDialog } from "./item-dialog";
 
 export function MenuClient({ menu }: { menu: Menu }) {
   const [activeItem, setActiveItem] = useState<MenuItem | null>(null);
+  const [query, setQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState<string>("all");
   const { count, subtotalCents, openDrawer } = useCart();
+
+  const q = query.trim().toLowerCase();
+
+  // Apply the category filter + text search, dropping empty categories.
+  const visibleCategories = useMemo(() => {
+    return menu.categories
+      .filter((c) => activeCategory === "all" || c.id === activeCategory)
+      .map((c) => ({
+        ...c,
+        items: c.items.filter(
+          (it) =>
+            !q ||
+            it.name.toLowerCase().includes(q) ||
+            it.description.toLowerCase().includes(q),
+        ),
+      }))
+      .filter((c) => c.items.length > 0);
+  }, [menu.categories, activeCategory, q]);
+
+  const resultCount = visibleCategories.reduce((n, c) => n + c.items.length, 0);
+  const isFiltering = q !== "" || activeCategory !== "all";
 
   return (
     <>
@@ -23,19 +47,71 @@ export function MenuClient({ menu }: { menu: Menu }) {
         </p>
       </section>
 
-      <div className="mx-auto max-w-5xl px-5 pb-24">
-        {menu.categories.length === 0 && (
-          <p className="py-20 text-center uppercase tracking-[0.15em] text-muted-foreground">
-            No items published yet.
+      {/* Sticky search + category filter toolbar */}
+      <div className="sticky top-[102px] z-30 border-b-2 border-border bg-background/95 backdrop-blur md:top-[120px]">
+        <div className="mx-auto max-w-6xl px-5 py-3">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search the menu…"
+              aria-label="Search the menu"
+              className="field-brutal pl-9 pr-9"
+            />
+            {query && (
+              <button
+                onClick={() => setQuery("")}
+                aria-label="Clear search"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-primary"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
+          <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+            <CategoryPill active={activeCategory === "all"} onClick={() => setActiveCategory("all")}>
+              All
+            </CategoryPill>
+            {menu.categories.map((c) => (
+              <CategoryPill
+                key={c.id}
+                active={activeCategory === c.id}
+                onClick={() => setActiveCategory(c.id)}
+              >
+                {c.name}
+              </CategoryPill>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-6xl px-5 pb-24">
+        {isFiltering && (
+          <p className="pt-6 text-xs uppercase tracking-[0.15em] text-muted-foreground">
+            {resultCount} {resultCount === 1 ? "item" : "items"}
+            {q && (
+              <>
+                {" "}
+                for “<span className="text-foreground">{query}</span>”
+              </>
+            )}
           </p>
         )}
 
-        {menu.categories.map((category) => (
-          <section key={category.id} id={slugify(category.name)} className="scroll-mt-28 pt-16">
+        {visibleCategories.length === 0 && (
+          <p className="py-20 text-center uppercase tracking-[0.15em] text-muted-foreground">
+            No items match your search.
+          </p>
+        )}
+
+        {visibleCategories.map((category) => (
+          <section key={category.id} id={slugify(category.name)} className="scroll-mt-44 pt-16">
             <h2 className="border-b-2 border-border pb-3 font-serif text-3xl font-semibold uppercase tracking-wide md:text-4xl">
               {category.name}
             </h2>
-            <div className="mt-8 grid gap-6 md:grid-cols-2">
+            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {category.items.map((item) => {
                 const prices = item.variations.map((v) => v.priceCents);
                 const min = prices.length ? Math.min(...prices) : 0;
@@ -51,7 +127,7 @@ export function MenuClient({ menu }: { menu: Menu }) {
                       <img
                         src={item.imageUrl}
                         alt={item.name}
-                        className="h-48 w-full border-b-2 border-border object-cover grayscale transition duration-500 hover:grayscale-0"
+                        className="aspect-square w-full border-b-2 border-border object-cover transition duration-500"
                       />
                     )}
                     <div className="flex flex-1 flex-col p-5">
@@ -81,32 +157,34 @@ export function MenuClient({ menu }: { menu: Menu }) {
           </section>
         ))}
 
-        {/* Contact */}
-        <section id="contact" className="scroll-mt-28 border-t-2 border-border pt-16 mt-20">
-          <h2 className="font-serif text-3xl font-semibold uppercase tracking-wide">Visit Us</h2>
-          <div className="mt-6 grid gap-6 text-sm md:grid-cols-3">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Address</p>
-              <p className="mt-2">974 High St, Armadale VIC 3143</p>
+        {/* Contact — only on the unfiltered view */}
+        {!isFiltering && (
+          <section id="contact" className="scroll-mt-44 border-t-2 border-border pt-16 mt-20">
+            <h2 className="font-serif text-3xl font-semibold uppercase tracking-wide">Visit Us</h2>
+            <div className="mt-6 grid gap-6 text-sm md:grid-cols-3">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Address</p>
+                <p className="mt-2">974 High St, Armadale VIC 3143</p>
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Hours</p>
+                <p className="mt-2">Tues–Sun · 7am–3pm</p>
+                <p>Monday · Closed</p>
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Contact</p>
+                <p className="mt-2">hello@europatisserie.com</p>
+                <p>(03) 9822 1234</p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Hours</p>
-              <p className="mt-2">Tues–Sun · 7am–3pm</p>
-              <p>Monday · Closed</p>
-            </div>
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Contact</p>
-              <p className="mt-2">hello@europatisserie.com</p>
-              <p>(03) 9822 1234</p>
-            </div>
-          </div>
-        </section>
+          </section>
+        )}
       </div>
 
       {/* Floating cart bar */}
       {count > 0 && (
         <div className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-border bg-background">
-          <div className="mx-auto max-w-5xl px-5 py-3">
+          <div className="mx-auto max-w-6xl px-5 py-3">
             <button onClick={openDrawer} className="btn-brutal w-full justify-between px-4 py-3 text-sm">
               <span className="flex items-center gap-2">
                 <span className="inline-flex h-6 min-w-6 items-center justify-center bg-primary-foreground px-1.5 text-xs text-primary tabular-nums">
@@ -128,5 +206,26 @@ export function MenuClient({ menu }: { menu: Menu }) {
         />
       )}
     </>
+  );
+}
+
+function CategoryPill({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`whitespace-nowrap border-2 border-border px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] transition ${
+        active ? "bg-primary text-primary-foreground" : "bg-card hover:bg-primary/10"
+      }`}
+    >
+      {children}
+    </button>
   );
 }

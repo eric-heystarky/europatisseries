@@ -22,6 +22,8 @@ export type CartLine = {
   basePriceCents: number;
   modifiers: CartModifier[];
   quantity: number;
+  /** Product image for the cart/checkout thumbnail. */
+  imageUrl?: string;
 };
 
 /** A line ready to add — quantity and key are derived by the reducer. */

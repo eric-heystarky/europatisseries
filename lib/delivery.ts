@@ -2,27 +2,29 @@ import "server-only";
 
 /**
  * Distance-based delivery pricing.
- *  - Origin: the shop. Customer address is geocoded, then a driving distance is
- *    measured from the shop.
+ *  - Origin: the shop (Armadale). The customer address is geocoded/routed and a
+ *    driving distance is measured from the shop.
  *  - Fee: $5 per km, rounded UP to the whole km.
  *  - Free delivery once the taxed order total (excluding delivery) reaches $300
  *    — that waiver is applied by the checkout action, not here.
  *
- * Uses free, keyless services (OpenStreetMap Nominatim + OSRM). Fine for low
- * volume; swap in a paid provider (Google/Mapbox) before heavy traffic.
+ * Primary provider: Google Maps **Routes API** (uses GOOGLE_MAPS_SERVER_KEY).
+ * Fallback: free, keyless OpenStreetMap services (Nominatim + OSRM) — used when
+ * the Google key is missing or Google errors, so deliveries never hard-fail.
  */
 
 export const SHOP_ORIGIN = {
-  // Verified via Nominatim: "1, Wiarando Court, Doncaster East, Victoria, 3109".
-  lat: -37.7732655,
-  lon: 145.1702448,
-  label: "1 Wiarando Court, Doncaster East VIC 3109",
+  // 974 High St, Armadale VIC 3143 (the actual shopfront).
+  address: "974 High St, Armadale VIC 3143, Australia",
+  lat: -37.8558,
+  lon: 145.0192,
+  label: "974 High St, Armadale VIC 3143",
 };
 
 export const PER_KM_CENTS = 500; // $5 per km
 export const FREE_DELIVERY_THRESHOLD_CENTS = 30_000; // $300 taxed total
 
-// A descriptive User-Agent is required by the Nominatim usage policy.
+// A descriptive User-Agent is required by the Nominatim usage policy (fallback).
 const UA = "square-menu-site/1.0 (hello@heystarky.com.au)";
 
 export type DeliveryAddress = {
@@ -45,6 +47,55 @@ function addressToQuery(a: DeliveryAddress): string {
     .filter(Boolean)
     .join(", ");
 }
+
+/** $5 per km, rounded up to the whole km. */
+export function deliveryFeeForKm(km: number): { billedKm: number; feeCents: number } {
+  const billedKm = Math.max(1, Math.ceil(km));
+  return { billedKm, feeCents: billedKm * PER_KM_CENTS };
+}
+
+// ── Primary: Google Maps Routes API ──────────────────────────────────────────
+
+/**
+ * Driving distance (km) from the shop to the destination via the Routes API,
+ * or null when the key is unset or Google returns no usable route (caller then
+ * falls back to OSM). Google geocodes both endpoints from their address strings.
+ */
+async function googleDrivingDistanceKm(address: DeliveryAddress): Promise<number | null> {
+  const key = process.env.GOOGLE_MAPS_SERVER_KEY;
+  if (!key) return null;
+
+  try {
+    const res = await fetch("https://routes.googleapis.com/directions/v2:computeRoutes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": key,
+        "X-Goog-FieldMask": "routes.distanceMeters",
+      },
+      body: JSON.stringify({
+        origin: { address: SHOP_ORIGIN.address },
+        destination: { address: addressToQuery(address) },
+        travelMode: "DRIVE",
+        units: "METRIC",
+      }),
+      signal: AbortSignal.timeout(8000),
+    });
+
+    if (!res.ok) {
+      console.warn(`Google Routes API returned ${res.status}; falling back to OSM.`);
+      return null;
+    }
+    const data = (await res.json()) as { routes?: Array<{ distanceMeters?: number }> };
+    const meters = data.routes?.[0]?.distanceMeters;
+    return typeof meters === "number" ? meters / 1000 : null;
+  } catch (err) {
+    console.warn("Google Routes API request failed; falling back to OSM.", err);
+    return null;
+  }
+}
+
+// ── Fallback: OpenStreetMap (Nominatim geocode + OSRM route) ──────────────────
 
 async function fetchJson(url: string, timeoutMs = 7000): Promise<unknown> {
   const res = await fetch(url, {
@@ -99,7 +150,7 @@ export async function geocode(
   return null;
 }
 
-/** Driving distance in km from the shop to a destination, or null on failure. */
+/** Driving distance in km from the shop to a destination via OSRM, or null on failure. */
 export async function drivingDistanceKm(dest: {
   lat: number;
   lon: number;
@@ -114,17 +165,10 @@ export async function drivingDistanceKm(dest: {
   return data.routes[0].distance / 1000;
 }
 
-/** $5 per km, rounded up to the whole km. */
-export function deliveryFeeForKm(km: number): { billedKm: number; feeCents: number } {
-  const billedKm = Math.max(1, Math.ceil(km));
-  return { billedKm, feeCents: billedKm * PER_KM_CENTS };
-}
-
-/**
- * Full quote for an address: geocode → driving distance → fee. Throws a
- * user-friendly Error if the address can't be located or routed.
- */
-export async function getDeliveryQuote(address: DeliveryAddress): Promise<DeliveryQuote> {
+/** Geocode + route via OSM. Throws a user-friendly Error if it can't resolve. */
+async function osmDistance(
+  address: DeliveryAddress,
+): Promise<{ km: number; resolvedAddress: string }> {
   const geo = await geocode(address);
   if (!geo) {
     throw new Error("We couldn't find that address. Please check it and try again.");
@@ -133,11 +177,30 @@ export async function getDeliveryQuote(address: DeliveryAddress): Promise<Delive
   if (km == null) {
     throw new Error("We couldn't calculate a delivery distance for that address.");
   }
+  return { km, resolvedAddress: geo.displayName };
+}
+
+// ── Public quote ─────────────────────────────────────────────────────────────
+
+/**
+ * Full quote for an address: distance (Google, then OSM fallback) → fee. Throws
+ * a user-friendly Error if the address can't be located or routed by any provider.
+ */
+export async function getDeliveryQuote(address: DeliveryAddress): Promise<DeliveryQuote> {
+  let km = await googleDrivingDistanceKm(address);
+  let resolvedAddress = addressToQuery(address);
+
+  if (km == null) {
+    const osm = await osmDistance(address);
+    km = osm.km;
+    resolvedAddress = osm.resolvedAddress;
+  }
+
   const { billedKm, feeCents } = deliveryFeeForKm(km);
   return {
     distanceKm: Math.round(km * 100) / 100,
     billedKm,
     feeCents,
-    resolvedAddress: geo.displayName,
+    resolvedAddress,
   };
 }

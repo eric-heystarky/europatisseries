@@ -2,9 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useCart, lineUnitPrice } from "./cart-context";
+import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
+import { useCart, lineUnitPrice, type CartLine } from "./cart-context";
 import { formatPrice } from "@/lib/format";
 import { CardForm, type CardFormHandle } from "./card-form";
+import { AddressAutocomplete } from "./address-autocomplete";
 import {
   placeOrder,
   quoteDelivery,
@@ -204,13 +206,21 @@ export function Checkout({ currency }: { currency: string }) {
   );
 
   return (
-    <main className="mx-auto max-w-md px-5 py-10">
+    <main className="mx-auto max-w-5xl px-5 py-10">
       <Link href="/" className="text-xs font-bold uppercase tracking-[0.15em] hover:underline">
         ← Back to menu
       </Link>
       <h1 className="mb-7 mt-4 font-serif text-4xl font-semibold uppercase tracking-wide">Checkout</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid gap-8 lg:grid-cols-[1fr_360px] lg:gap-12">
+        <OrderSummary
+          lines={lines}
+          currency={currency}
+          subtotalCents={subtotalCents}
+          deliveryQuote={fulfillmentType === "DELIVERY" ? quote : null}
+          estimatedTotalCents={estimatedTotalCents}
+        />
+        <form onSubmit={handleSubmit} className="space-y-6 lg:col-start-1 lg:row-start-1">
         <div>
           <label className="text-xs font-bold uppercase tracking-[0.18em]">How would you like your order?</label>
           <div className="mt-2 grid grid-cols-2 gap-2">
@@ -261,6 +271,9 @@ export function Checkout({ currency }: { currency: string }) {
         {fulfillmentType === "DELIVERY" && (
           <div className="space-y-3 border-2 border-border p-4">
             <label className="text-xs font-bold uppercase tracking-[0.18em]">Delivery address</label>
+            <AddressAutocomplete
+              onSelect={(a) => setAddr((prev) => ({ ...prev, ...a }))}
+            />
             <input value={addr.line1} onChange={(e) => setAddrField("line1", e.target.value)} placeholder="Street address" className="field-brutal" />
             <input value={addr.line2} onChange={(e) => setAddrField("line2", e.target.value)} placeholder="Unit / apt (optional)" className="field-brutal" />
             <div className="grid grid-cols-3 gap-2">
@@ -295,41 +308,6 @@ export function Checkout({ currency }: { currency: string }) {
           <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. leave at door" className="field-brutal mt-1" />
         </div>
 
-        {/* Summary */}
-        <div className="border-2 border-border bg-card p-4">
-          <h2 className="text-xs font-bold uppercase tracking-[0.18em]">Your order</h2>
-          <ul className="mt-3 space-y-1.5 text-sm">
-            {lines.map((l) => (
-              <li key={l.key} className="flex justify-between gap-3">
-                <span className="text-muted-foreground">
-                  {l.quantity}× {l.itemName}
-                  {l.modifiers.length > 0 && (
-                    <span className="text-muted-foreground/70"> ({l.modifiers.map((m) => m.name).join(", ")})</span>
-                  )}
-                </span>
-                <span className="tabular-nums">{formatPrice(lineUnitPrice(l) * l.quantity, currency)}</span>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-3 space-y-1 border-t-2 border-border pt-2 text-sm">
-            <div className="flex justify-between text-muted-foreground">
-              <span>Subtotal</span>
-              <span className="tabular-nums">{formatPrice(subtotalCents, currency)}</span>
-            </div>
-            {fulfillmentType === "DELIVERY" && quote && (
-              <div className="flex justify-between text-muted-foreground">
-                <span>Delivery{quote.waived ? " (free over $300)" : ` (${quote.billedKm} km)`}</span>
-                <span className="tabular-nums">{quote.feeCents === 0 ? "Free" : formatPrice(quote.feeCents, currency)}</span>
-              </div>
-            )}
-            <div className="flex justify-between font-bold uppercase tracking-[0.1em]">
-              <span>Estimated total</span>
-              <span className="tabular-nums">{formatPrice(estimatedTotalCents, currency)}</span>
-            </div>
-          </div>
-          <p className="mt-1 text-xs text-muted-foreground">Tax is calculated by Square at payment.</p>
-        </div>
-
         {/* Card */}
         <div>
           <label className="text-xs font-bold uppercase tracking-[0.18em]">Card details</label>
@@ -348,7 +326,114 @@ export function Checkout({ currency }: { currency: string }) {
         <button type="submit" disabled={submitting} className="btn-brutal w-full py-3.5 text-sm">
           {submitting ? "Placing order…" : "Place order"}
         </button>
-      </form>
+        </form>
+      </div>
     </main>
+  );
+}
+
+const HIDDEN_VARIATIONS = ["Each", "Slice", "Regular"];
+
+/** Sticky order-summary panel: line items with thumbnails + totals. */
+function OrderSummary({
+  lines,
+  currency,
+  subtotalCents,
+  deliveryQuote,
+  estimatedTotalCents,
+}: {
+  lines: CartLine[];
+  currency: string;
+  subtotalCents: number;
+  deliveryQuote: Quote | null;
+  estimatedTotalCents: number;
+}) {
+  const { setQty, remove } = useCart();
+  return (
+    <aside className="h-fit border-2 border-border bg-card lg:sticky lg:top-28 lg:col-start-2 lg:row-start-1">
+      <div className="border-b-2 border-border px-5 py-3">
+        <h2 className="text-xs font-bold uppercase tracking-[0.18em]">Order summary</h2>
+      </div>
+      <ul className="max-h-[45vh] divide-y-2 divide-border overflow-y-auto px-5 lg:max-h-none">
+        {lines.map((l) => {
+          const subline = [l.variationName, ...l.modifiers.map((m) => m.name)]
+            .filter((s) => s && !HIDDEN_VARIATIONS.includes(s))
+            .join(" · ");
+          return (
+            <li key={l.key} className="flex gap-3 py-4">
+              <div className="h-16 w-16 flex-none border-2 border-border bg-background">
+                {l.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={l.imageUrl} alt={l.itemName} className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+                    <ShoppingBag className="h-5 w-5" strokeWidth={1.25} />
+                  </div>
+                )}
+              </div>
+              <div className="flex min-w-0 flex-1 flex-col">
+                <div className="flex justify-between gap-2">
+                  <p className="text-sm font-bold uppercase leading-tight tracking-wide">{l.itemName}</p>
+                  <button
+                    type="button"
+                    onClick={() => remove(l.key)}
+                    aria-label={`Remove ${l.itemName}`}
+                    className="flex-none text-muted-foreground transition hover:text-primary"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+                {subline && <p className="mt-0.5 truncate text-xs text-muted-foreground">{subline}</p>}
+                <div className="mt-auto flex items-center justify-between pt-2">
+                  <div className="flex items-center border-2 border-border text-sm">
+                    <button
+                      type="button"
+                      onClick={() => setQty(l.key, l.quantity - 1)}
+                      className="px-2 py-1 hover:bg-primary hover:text-primary-foreground"
+                      aria-label="Decrease quantity"
+                    >
+                      <Minus className="h-3.5 w-3.5" />
+                    </button>
+                    <span className="w-8 text-center tabular-nums">{l.quantity}</span>
+                    <button
+                      type="button"
+                      onClick={() => setQty(l.key, l.quantity + 1)}
+                      className="px-2 py-1 hover:bg-primary hover:text-primary-foreground"
+                      aria-label="Increase quantity"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                  <span className="whitespace-nowrap text-sm font-bold tabular-nums">
+                    {formatPrice(lineUnitPrice(l) * l.quantity, currency)}
+                  </span>
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+      <div className="space-y-1 border-t-2 border-border px-5 py-4 text-sm">
+        <div className="flex justify-between text-muted-foreground">
+          <span>Subtotal</span>
+          <span className="tabular-nums">{formatPrice(subtotalCents, currency)}</span>
+        </div>
+        {deliveryQuote && (
+          <div className="flex justify-between text-muted-foreground">
+            <span>
+              Delivery{deliveryQuote.waived ? " (free over $300)" : ` (${deliveryQuote.billedKm} km)`}
+            </span>
+            <span className="tabular-nums">
+              {deliveryQuote.feeCents === 0 ? "Free" : formatPrice(deliveryQuote.feeCents, currency)}
+            </span>
+          </div>
+        )}
+        <div className="flex justify-between pt-1 text-base font-bold uppercase tracking-[0.1em]">
+          <span>Total</span>
+          <span className="tabular-nums">{formatPrice(estimatedTotalCents, currency)}</span>
+        </div>
+        <p className="pt-1 text-xs text-muted-foreground">Tax is calculated by Square at payment.</p>
+      </div>
+    </aside>
   );
 }

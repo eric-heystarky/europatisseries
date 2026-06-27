@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { CartProvider } from "@/components/cart-context";
-import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
 import { CartDrawer } from "@/components/cart-drawer";
+import { ThemeProvider } from "@/components/theme-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "@/components/ui/sonner";
+import { AppFrame } from "@/components/app-frame";
 
 // The brand's own faces. Faro for body/headings, Shorelines for script display.
 const faro = localFont({
@@ -31,15 +34,20 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${faro.variable} ${shorelines.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <CartProvider>
-          <Navbar />
-          <main className="flex-1 pt-[92px] md:pt-[100px]">{children}</main>
-          <Footer />
-          <CartDrawer />
-        </CartProvider>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
+          <CartProvider>
+            <TooltipProvider>
+              <AppFrame>{children}</AppFrame>
+              <CartDrawer />
+              <Toaster />
+              <SonnerToaster />
+            </TooltipProvider>
+          </CartProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
