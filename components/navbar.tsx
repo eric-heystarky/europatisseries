@@ -27,6 +27,9 @@ export function Navbar() {
   const primaryNavLinks = [
     { name: "PASTRIES", path: "/pre-order" },
     { name: "CATERING", path: "/catering" },
+    { name: "GIFT CARDS", path: "/gift-cards" },
+    { name: "ABOUT", path: "/about" },
+    { name: "FAQ", path: "/faq" },
     { name: "JOIN THE TEAM", path: "/join-team" },
     { name: "CONTACT", path: "/contact" },
   ];
