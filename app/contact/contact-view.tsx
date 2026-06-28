@@ -45,7 +45,7 @@ export default function Contact() {
           <div>
             <h3 className="font-shorelines text-3xl mb-3 border-b-2 border-primary pb-1 inline-block">Hours</h3>
             <p className="text-lg font-medium leading-relaxed">
-              Tues - Sun: 7am - 2pm<br/>
+              Tues - Sun: 7am - 3pm<br/>
               Mon: Closed
             </p>
           </div>
