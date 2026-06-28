@@ -21,7 +21,14 @@ const shorelines = localFont({
   display: "swap",
 });
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000");
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Euro Patisserie Armadale — Order Online",
   description: "Premium European pastries & catering, made in Armadale. Order pickup or delivery.",
 };
