@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Script from "next/script";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import { useRef, useState, useEffect } from "react";
@@ -285,18 +286,29 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Google Reviews Widget */}
+      {/* Google Reviews Widget — live, full width via ReputationHub */}
       <section className="py-16 md:py-24 px-4 md:px-8 bg-primary text-primary-foreground border-t-2 border-primary overflow-hidden">
-        <AnimatedSection className="max-w-7xl mx-auto">
+        <AnimatedSection className="w-full">
           <div className="mb-8 md:mb-12 border-b-2 border-primary-foreground/20 pb-6 md:pb-8">
             <h2 className="text-5xl sm:text-6xl md:text-8xl font-shorelines leading-none">
               Reviews
             </h2>
           </div>
           <div className="w-full min-h-[400px]">
-            <iframe className='lc_reviews_widget' src='https://reputationhub.site/reputation/widgets/review_widget/PsjVrU6emhtFrBnTcoK1?widgetId=6a3cc2f8a21cf6c124dc7c74' frameBorder='0' scrolling='no' style={{ minWidth: '100%', width: '100%' }}></iframe>
+            <iframe
+              className="lc_reviews_widget"
+              src="https://reputationhub.site/reputation/widgets/review_widget/PsjVrU6emhtFrBnTcoK1"
+              frameBorder="0"
+              scrolling="no"
+              style={{ minWidth: "100%", width: "100%" }}
+            ></iframe>
           </div>
         </AnimatedSection>
+        {/* Widget enhancer: auto-resizes the iframe to fit all reviews (makes it "live"). */}
+        <Script
+          src="https://reputationhub.site/reputation/assets/review-widget.js"
+          strategy="lazyOnload"
+        />
       </section>
 
       {/* Instagram Widget */}
@@ -311,6 +323,8 @@ export default function Index() {
             <div className="commonninja_component pid-ee1f0403-91ac-4e12-b9f6-d60465fbee01 min-h-[400px]"></div>
           </div>
         </AnimatedSection>
+        {/* CommonNinja SDK — renders the Instagram feed into the div above. */}
+        <Script src="https://cdn.commoninja.com/sdk/latest/commonninja.js" strategy="lazyOnload" />
       </section>
     </div>
   );
