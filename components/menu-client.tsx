@@ -111,7 +111,61 @@ export function MenuClient({ menu }: { menu: Menu }) {
             <h2 className="border-b-2 border-border pb-3 font-serif text-3xl font-semibold uppercase tracking-wide md:text-4xl">
               {category.name}
             </h2>
-            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Mobile: Square-style tappable rows (text left, thumbnail right) */}
+            <ul className="mt-4 border-t-2 border-border md:hidden">
+              {category.items.map((item) => {
+                const prices = item.variations.map((v) => v.priceCents);
+                const min = prices.length ? Math.min(...prices) : 0;
+                const multi = item.variations.length > 1;
+                const hasOptions = multi || item.modifierLists.length > 0;
+                return (
+                  <li key={item.id}>
+                    <button
+                      onClick={() => setActiveItem(item)}
+                      className="group flex w-full items-stretch gap-4 border-b-2 border-border py-4 text-left transition hover:bg-primary/5"
+                    >
+                      <div className="flex min-w-0 flex-1 flex-col">
+                        <h3 className="font-serif text-lg font-semibold leading-tight">{item.name}</h3>
+                        {item.description && (
+                          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{item.description}</p>
+                        )}
+                        <div className="mt-auto flex items-center gap-3 pt-2">
+                          <span className="font-bold tabular-nums">
+                            {multi ? "from " : ""}
+                            {formatPrice(min, menu.currency)}
+                          </span>
+                          {hasOptions && (
+                            <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+                              Options
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {item.imageUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={item.imageUrl}
+                          alt={item.name}
+                          loading="lazy"
+                          decoding="async"
+                          className="h-24 w-24 flex-none border-2 border-border object-cover"
+                        />
+                      ) : (
+                        <span
+                          aria-hidden
+                          className="flex h-24 w-24 flex-none items-center justify-center border-2 border-border bg-card text-3xl font-light text-primary/30 transition group-hover:bg-primary group-hover:text-primary-foreground"
+                        >
+                          +
+                        </span>
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+
+            {/* Tablet & desktop: 3-up grid with square-cropped photos */}
+            <div className="mt-8 hidden gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">
               {category.items.map((item) => {
                 const prices = item.variations.map((v) => v.priceCents);
                 const min = prices.length ? Math.min(...prices) : 0;
@@ -120,7 +174,7 @@ export function MenuClient({ menu }: { menu: Menu }) {
                 return (
                   <article
                     key={item.id}
-                    className="flex flex-col border-2 border-border bg-card transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_var(--color-primary)]"
+                    className="flex flex-col border-2 border-border bg-card transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_hsl(var(--primary))]"
                   >
                     {item.imageUrl && (
                       // eslint-disable-next-line @next/next/no-img-element
