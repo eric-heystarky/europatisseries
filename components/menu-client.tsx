@@ -49,7 +49,7 @@ export function MenuClient({ menu }: { menu: Menu }) {
 
       {/* Sticky search + category filter toolbar */}
       <div className="sticky top-[102px] z-30 border-b-2 border-border bg-background/95 backdrop-blur md:top-[120px]">
-        <div className="mx-auto max-w-2xl px-5 py-3">
+        <div className="mx-auto max-w-6xl px-5 py-3">
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
@@ -87,7 +87,7 @@ export function MenuClient({ menu }: { menu: Menu }) {
         </div>
       </div>
 
-      <div className="mx-auto max-w-2xl px-5 pb-24">
+      <div className="mx-auto max-w-6xl px-5 pb-24">
         {isFiltering && (
           <p className="pt-6 text-xs uppercase tracking-[0.15em] text-muted-foreground">
             {resultCount} {resultCount === 1 ? "item" : "items"}
@@ -107,66 +107,55 @@ export function MenuClient({ menu }: { menu: Menu }) {
         )}
 
         {visibleCategories.map((category) => (
-          <section key={category.id} id={slugify(category.name)} className="scroll-mt-44 pt-10">
-            <h2 className="font-serif text-2xl font-semibold uppercase tracking-wide md:text-3xl">
+          <section key={category.id} id={slugify(category.name)} className="scroll-mt-44 pt-16">
+            <h2 className="border-b-2 border-border pb-3 font-serif text-3xl font-semibold uppercase tracking-wide md:text-4xl">
               {category.name}
             </h2>
-            {/* Square-style tappable rows: text left, thumbnail right. */}
-            <ul className="mt-4 border-t-2 border-border">
+            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {category.items.map((item) => {
                 const prices = item.variations.map((v) => v.priceCents);
                 const min = prices.length ? Math.min(...prices) : 0;
                 const multi = item.variations.length > 1;
                 const hasOptions = multi || item.modifierLists.length > 0;
                 return (
-                  <li key={item.id}>
-                    <button
-                      onClick={() => setActiveItem(item)}
-                      className="group flex w-full items-stretch gap-4 border-b-2 border-border py-4 text-left transition hover:bg-primary/5"
-                    >
-                      <div className="flex min-w-0 flex-1 flex-col">
-                        <h3 className="font-serif text-lg font-semibold leading-tight">
-                          {item.name}
-                        </h3>
-                        {item.description && (
-                          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-                            {item.description}
-                          </p>
-                        )}
-                        <div className="mt-auto flex items-center gap-3 pt-2">
-                          <span className="font-bold tabular-nums">
-                            {multi ? "from " : ""}
-                            {formatPrice(min, menu.currency)}
-                          </span>
-                          {hasOptions && (
-                            <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
-                              Options
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      {item.imageUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={item.imageUrl}
-                          alt={item.name}
-                          loading="lazy"
-                          decoding="async"
-                          className="h-24 w-24 flex-none border-2 border-border object-cover sm:h-28 sm:w-28"
-                        />
-                      ) : (
-                        <span
-                          aria-hidden
-                          className="flex h-24 w-24 flex-none items-center justify-center border-2 border-border bg-card text-3xl font-light text-primary/30 transition group-hover:bg-primary group-hover:text-primary-foreground sm:h-28 sm:w-28"
-                        >
-                          +
+                  <article
+                    key={item.id}
+                    className="flex flex-col border-2 border-border bg-card transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_var(--color-primary)]"
+                  >
+                    {item.imageUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        loading="lazy"
+                        decoding="async"
+                        className="aspect-square w-full border-b-2 border-border object-cover transition duration-500"
+                      />
+                    )}
+                    <div className="flex flex-1 flex-col p-5">
+                      <div className="flex items-baseline justify-between gap-3">
+                        <h3 className="font-serif text-xl font-semibold">{item.name}</h3>
+                        <span className="whitespace-nowrap font-bold tabular-nums">
+                          {multi ? "from " : ""}
+                          {formatPrice(min, menu.currency)}
                         </span>
+                      </div>
+                      {item.description && (
+                        <p className="mt-1 flex-1 text-sm text-muted-foreground">
+                          {item.description}
+                        </p>
                       )}
-                    </button>
-                  </li>
+                      <button
+                        onClick={() => setActiveItem(item)}
+                        className="btn-brutal mt-5 py-2.5 text-xs"
+                      >
+                        {hasOptions ? "Choose options" : "Add to cart"}
+                      </button>
+                    </div>
+                  </article>
                 );
               })}
-            </ul>
+            </div>
           </section>
         ))}
 
@@ -197,7 +186,7 @@ export function MenuClient({ menu }: { menu: Menu }) {
       {/* Floating cart bar */}
       {count > 0 && (
         <div className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-border bg-background">
-          <div className="mx-auto max-w-2xl px-5 py-3">
+          <div className="mx-auto max-w-6xl px-5 py-3">
             <button onClick={openDrawer} className="btn-brutal w-full justify-between px-4 py-3 text-sm">
               <span className="flex items-center gap-2">
                 <span className="inline-flex h-6 min-w-6 items-center justify-center bg-primary-foreground px-1.5 text-xs text-primary tabular-nums">
