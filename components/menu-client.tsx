@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { Search, X } from "lucide-react";
 import type { Menu, MenuItem } from "@/lib/menu";
 import { formatPrice, slugify } from "@/lib/format";
@@ -166,14 +167,18 @@ export function MenuClient({ menu }: { menu: Menu }) {
 
             {/* Tablet & desktop: 3-up grid with square-cropped photos */}
             <div className="mt-8 hidden gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">
-              {category.items.map((item) => {
+              {category.items.map((item, i) => {
                 const prices = item.variations.map((v) => v.priceCents);
                 const min = prices.length ? Math.min(...prices) : 0;
                 const multi = item.variations.length > 1;
                 const hasOptions = multi || item.modifierLists.length > 0;
                 return (
-                  <article
+                  <motion.article
                     key={item.id}
+                    initial={{ opacity: 0, y: 18 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1], delay: (i % 3) * 0.07 }}
                     className="flex flex-col border-2 border-border bg-card transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_hsl(var(--primary))]"
                   >
                     {item.imageUrl && (
@@ -206,7 +211,7 @@ export function MenuClient({ menu }: { menu: Menu }) {
                         {hasOptions ? "Choose options" : "Add to cart"}
                       </button>
                     </div>
-                  </article>
+                  </motion.article>
                 );
               })}
             </div>

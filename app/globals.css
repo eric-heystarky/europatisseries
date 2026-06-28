@@ -175,3 +175,21 @@
     box-shadow: 3px 3px 0 0 hsl(var(--primary));
   }
 }
+
+/* Subtle page-enter fade — CSS-only so it never affects fixed/sticky layout. */
+@keyframes page-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.animate-page-in {
+  animation: page-in 0.3s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-page-in {
+    animation: none;
+  }
+}

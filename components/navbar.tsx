@@ -214,9 +214,15 @@ export function Navbar() {
             >
               <ShoppingBag className="w-5 h-5 md:w-6 md:h-6" />
               {count > 0 && (
-                <span className="absolute -right-2 -top-2 inline-flex h-4 min-w-4 items-center justify-center bg-primary px-1 text-[10px] font-bold text-primary-foreground tabular-nums">
+                <motion.span
+                  key={count}
+                  initial={{ scale: 0.4 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 600, damping: 14 }}
+                  className="absolute -right-2 -top-2 inline-flex h-4 min-w-4 items-center justify-center bg-primary px-1 text-[10px] font-bold text-primary-foreground tabular-nums"
+                >
                   {count}
-                </span>
+                </motion.span>
               )}
             </button>
           </div>

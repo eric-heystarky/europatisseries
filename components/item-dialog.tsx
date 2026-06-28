@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
+import { X, ZoomIn } from "lucide-react";
 import type { MenuItem, MenuModifierList } from "@/lib/menu";
 import { formatPrice } from "@/lib/format";
 import { useCart, type CartModifier } from "./cart-context";
@@ -12,13 +14,14 @@ type Props = {
 };
 
 export function ItemDialog({ item, currency, onClose }: Props) {
-  const { addLine } = useCart();
+  const { addLine, openDrawer } = useCart();
 
   const [variationId, setVariationId] = useState(item.variations[0]?.id ?? "");
   const [selected, setSelected] = useState<Record<string, string[]>>(() =>
     defaultSelections(item.modifierLists),
   );
   const [quantity, setQuantity] = useState(1);
+  const [zoomed, setZoomed] = useState(false);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -76,10 +79,37 @@ export function ItemDialog({ item, currency, onClose }: Props) {
       },
       quantity,
     );
+    toast.custom(
+      (id) => (
+        <div className="flex w-full items-center gap-3 border-2 border-border bg-background p-3 shadow-[5px_5px_0_0_hsl(var(--primary))]">
+          {item.imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={item.imageUrl} alt="" className="h-12 w-12 flex-none border-2 border-border object-cover" />
+          ) : null}
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-muted-foreground">Added to cart</p>
+            <p className="truncate text-sm font-semibold">
+              {quantity}× {item.name}
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              toast.dismiss(id);
+              openDrawer();
+            }}
+            className="flex-none border-2 border-primary bg-primary px-3 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-primary-foreground"
+          >
+            View
+          </button>
+        </div>
+      ),
+      { duration: 3500 },
+    );
     onClose();
   }
 
   return (
+    <>
     <div
       className="fixed inset-0 z-[70] flex items-end justify-center bg-primary/40 p-0 sm:items-center sm:p-4"
       onClick={onClose}
@@ -89,12 +119,22 @@ export function ItemDialog({ item, currency, onClose }: Props) {
         onClick={(e) => e.stopPropagation()}
       >
         {item.imageUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={item.imageUrl}
-            alt={item.name}
-            className="h-40 w-full flex-none border-b-2 border-border object-cover"
-          />
+          <button
+            type="button"
+            onClick={() => setZoomed(true)}
+            aria-label="Zoom photo"
+            className="group relative h-40 w-full flex-none cursor-zoom-in overflow-hidden border-b-2 border-border"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={item.imageUrl}
+              alt={item.name}
+              className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            />
+            <span className="absolute bottom-2 right-2 flex items-center gap-1 bg-primary/85 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-primary-foreground">
+              <ZoomIn className="h-3 w-3" /> Zoom
+            </span>
+          </button>
         )}
 
         <div className="flex-1 overflow-y-auto px-5 pb-4 pt-4">
@@ -199,6 +239,27 @@ export function ItemDialog({ item, currency, onClose }: Props) {
         </div>
       </div>
     </div>
+
+    {zoomed && item.imageUrl && (
+      <div
+        className="fixed inset-0 z-[80] flex items-center justify-center bg-black/90 p-4"
+        onClick={() => setZoomed(false)}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={item.imageUrl} alt={item.name} className="max-h-full max-w-full object-contain" />
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setZoomed(false);
+          }}
+          aria-label="Close zoom"
+          className="absolute right-4 top-4 border-2 border-white p-2 text-white transition hover:bg-white hover:text-black"
+        >
+          <X className="h-5 w-5" />
+        </button>
+      </div>
+    )}
+    </>
   );
 }
 

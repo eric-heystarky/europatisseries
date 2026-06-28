@@ -11,6 +11,11 @@ const HIDDEN_VARIATIONS = ["Each", "Slice", "Regular"];
 export function CartDrawer({ currency = "AUD" }: { currency?: string }) {
   const { lines, count, subtotalCents, setQty, remove, clear, drawerOpen, closeDrawer } = useCart();
 
+  // Free delivery on orders over $300 — nudge the customer toward it.
+  const FREE_DELIVERY_CENTS = 30_000;
+  const freeRemaining = Math.max(0, FREE_DELIVERY_CENTS - subtotalCents);
+  const freePct = Math.min(100, Math.round((subtotalCents / FREE_DELIVERY_CENTS) * 100));
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && closeDrawer();
     window.addEventListener("keydown", onKey);
@@ -136,6 +141,26 @@ export function CartDrawer({ currency = "AUD" }: { currency?: string }) {
 
         {lines.length > 0 && (
           <footer className="border-t-2 border-border px-5 py-4">
+            {/* Free-delivery progress */}
+            <div className="mb-4">
+              <p className="text-xs font-bold uppercase tracking-[0.12em]">
+                {freeRemaining > 0 ? (
+                  <>
+                    Add <span className="tabular-nums">{formatPrice(freeRemaining, currency)}</span> for free
+                    delivery
+                  </>
+                ) : (
+                  <>🎉 You&apos;ve unlocked free delivery!</>
+                )}
+              </p>
+              <div className="mt-2 h-2.5 w-full border-2 border-border bg-card">
+                <div
+                  className="h-full bg-primary transition-all duration-500 ease-out"
+                  style={{ width: `${freePct}%` }}
+                />
+              </div>
+            </div>
+
             <div className="flex justify-between text-sm font-bold uppercase tracking-[0.15em]">
               <span>Subtotal</span>
               <span className="tabular-nums">{formatPrice(subtotalCents, currency)}</span>
