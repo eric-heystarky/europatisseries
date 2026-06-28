@@ -295,9 +295,18 @@ export default function Index() {
             </h2>
           </div>
           <div className="w-full min-h-[400px]">
+            {/* Desktop / tablet review widget */}
             <iframe
-              className="lc_reviews_widget"
+              className="lc_reviews_widget hidden md:block"
               src="https://reputationhub.site/reputation/widgets/review_widget/PsjVrU6emhtFrBnTcoK1"
+              frameBorder="0"
+              scrolling="no"
+              style={{ minWidth: "100%", width: "100%" }}
+            ></iframe>
+            {/* Mobile review widget (compact layout) */}
+            <iframe
+              className="lc_reviews_widget md:hidden"
+              src="https://reputationhub.site/reputation/widgets/review_widget/PsjVrU6emhtFrBnTcoK1?widgetId=6a40f001d76d9aa56f396d9e"
               frameBorder="0"
               scrolling="no"
               style={{ minWidth: "100%", width: "100%" }}

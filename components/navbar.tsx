@@ -160,7 +160,9 @@ export function Navbar() {
                 src={LOGO}
                 alt="Euro Patisserie"
                 className={`h-full max-h-[45px] md:max-h-[60px] object-contain transition-all duration-300 ${
-                  isHomePage && isScrolled ? "brightness-0 invert" : ""
+                  // Over the dark hero (home, not scrolled): keep the logo white.
+                  // On the solid bar: navy in light mode, white in dark mode.
+                  isHomePage && !isScrolled ? "" : "brightness-0 dark:invert"
                 }`}
               />
             </Link>
