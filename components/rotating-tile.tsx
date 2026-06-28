@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMenuImages } from "@/lib/use-menu-images";
 
 /**
@@ -19,12 +19,14 @@ export function RotatingTileImage({
 }) {
   const images = useMenuImages();
   const [step, setStep] = useState(0);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
-    if (images.length < 2) return;
+    // Respect prefers-reduced-motion: hold a single photo instead of flipping.
+    if (reduceMotion || images.length < 2) return;
     const t = setInterval(() => setStep((s) => s + 1), intervalMs);
     return () => clearInterval(t);
-  }, [images, intervalMs]);
+  }, [images, intervalMs, reduceMotion]);
 
   if (!images.length) return <div className="absolute inset-0 bg-primary/10" />;
 

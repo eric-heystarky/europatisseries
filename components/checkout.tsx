@@ -256,15 +256,15 @@ export function Checkout({ currency }: { currency: string }) {
         <div className="space-y-3">
           <div>
             <label className="text-xs font-bold uppercase tracking-[0.18em]">Name</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} className="field-brutal mt-1" />
+            <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="field-brutal mt-1" />
           </div>
           <div>
             <label className="text-xs font-bold uppercase tracking-[0.18em]">Phone</label>
-            <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" className="field-brutal mt-1" />
+            <input value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" inputMode="tel" autoComplete="tel" className="field-brutal mt-1" />
           </div>
           <div>
             <label className="text-xs font-bold uppercase tracking-[0.18em]">Email (optional)</label>
-            <input value={email} onChange={(e) => setEmail(e.target.value)} inputMode="email" className="field-brutal mt-1" />
+            <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" inputMode="email" autoComplete="email" className="field-brutal mt-1" />
           </div>
         </div>
 

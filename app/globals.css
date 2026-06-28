@@ -163,11 +163,12 @@
   /* Brutalist form field. */
   .field-brutal {
     width: 100%;
+    min-height: 44px; /* comfortable touch target */
     border: 2px solid hsl(var(--primary));
     background: hsl(var(--card));
     border-radius: 0;
     padding: 0.625rem 0.75rem;
-    font-size: 0.875rem;
+    font-size: 1rem; /* 16px — prevents iOS focus auto-zoom */
     outline: none;
   }
   .field-brutal:focus {

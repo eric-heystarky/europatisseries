@@ -60,6 +60,9 @@ export default function Index() {
 
   return (
     <div className="flex flex-col w-full">
+      <h1 className="sr-only">
+        Euro Patisserie Armadale — European pastries, cakes &amp; catering
+      </h1>
       {/* Hero Section */}
       <section ref={heroRef} className="relative min-h-[100vh] md:min-h-[85vh] w-full border-b-2 border-primary overflow-hidden flex items-center bg-primary">
         {/* Background Images */}

@@ -127,6 +127,8 @@ export function MenuClient({ menu }: { menu: Menu }) {
                       <img
                         src={item.imageUrl}
                         alt={item.name}
+                        loading="lazy"
+                        decoding="async"
                         className="aspect-square w-full border-b-2 border-border object-cover transition duration-500"
                       />
                     )}
@@ -221,7 +223,7 @@ function CategoryPill({
   return (
     <button
       onClick={onClick}
-      className={`whitespace-nowrap border-2 border-border px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] transition ${
+      className={`min-h-11 whitespace-nowrap border-2 border-border px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] transition ${
         active ? "bg-primary text-primary-foreground" : "bg-card hover:bg-primary/10"
       }`}
     >

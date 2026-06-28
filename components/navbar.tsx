@@ -60,6 +60,7 @@ export function Navbar() {
                 <Button
                   variant="ghost"
                   size="icon"
+                  aria-label="Open menu"
                   className={`group hover:bg-primary hover:text-primary-foreground border-2 border-transparent hover:border-primary rounded-none ${
                     isHomePage && !isScrolled ? "text-primary-foreground" : "text-primary"
                   }`}
@@ -122,7 +123,7 @@ export function Navbar() {
                   {/* Mobile-only social and search links */}
                   <div className="md:hidden flex gap-4 mt-auto pt-4 border-t-2 border-primary w-full">
                     <a
-                      href="https://www.instagram.com/europatisseriearmadale/?hl=en"
+                      aria-label="Euro Patisserie on Instagram" href="https://www.instagram.com/europatisseriearmadale/?hl=en"
                       target="_blank"
                       rel="noreferrer"
                       className="text-primary hover:opacity-70 transition-opacity"
@@ -130,7 +131,7 @@ export function Navbar() {
                       <Instagram className="w-6 h-6" />
                     </a>
                     <a
-                      href="https://www.tiktok.com/@europatisseriearmadale"
+                      aria-label="Euro Patisserie on TikTok" href="https://www.tiktok.com/@europatisseriearmadale"
                       target="_blank"
                       rel="noreferrer"
                       className="text-primary hover:opacity-70 transition-opacity"
@@ -140,7 +141,7 @@ export function Navbar() {
                       </svg>
                     </a>
                     <ThemeToggle className="text-primary hover:opacity-70 transition-opacity ml-auto" />
-                    <button className="text-primary hover:opacity-70 transition-opacity ml-4">
+                    <button aria-label="Search" className="text-primary hover:opacity-70 transition-opacity ml-4">
                       <Search className="w-6 h-6" />
                     </button>
                   </div>
@@ -166,7 +167,7 @@ export function Navbar() {
           <div className="flex items-center justify-end gap-3 md:gap-5 w-[100px] md:w-[200px]">
             <div className="hidden md:flex items-center gap-3 md:gap-5">
               <a
-                href="https://www.instagram.com/europatisseriearmadale/?hl=en"
+                aria-label="Euro Patisserie on Instagram" href="https://www.instagram.com/europatisseriearmadale/?hl=en"
                 target="_blank"
                 rel="noreferrer"
                 className={`hover:opacity-70 transition-opacity ${
@@ -176,7 +177,7 @@ export function Navbar() {
                 <Instagram className="w-5 h-5 md:w-6 md:h-6" />
               </a>
               <a
-                href="https://www.tiktok.com/@europatisseriearmadale"
+                aria-label="Euro Patisserie on TikTok" href="https://www.tiktok.com/@europatisseriearmadale"
                 target="_blank"
                 rel="noreferrer"
                 className={`hover:opacity-70 transition-opacity ${
@@ -188,6 +189,7 @@ export function Navbar() {
                 </svg>
               </a>
               <button
+                aria-label="Search"
                 className={`hover:opacity-70 transition-opacity ${
                   isHomePage && !isScrolled ? "text-primary-foreground" : "text-primary"
                 }`}
