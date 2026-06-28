@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { AnimatedSection } from "@/components/AnimatedSection";
 import { Testimonials } from "@/components/testimonials";
+
+export const metadata: Metadata = {
+  title: "Our Story — A European Bakery in Armadale",
+  description:
+    "Euro Patisserie is a European bakery in Armadale where French technique meets a warm neighbourhood welcome. Everything made by hand, in-house, every day.",
+  alternates: { canonical: "/about" },
+};
 
 const SHOP = "https://vibe.filesafe.space/1782359074813107391/attachments/982a14ae-934a-417e-828f-386be0dadded.png";
 const CAKE = "https://vibe.filesafe.space/1782359074813107391/attachments/10a71050-16bc-405f-af35-634769e62040.jpg";

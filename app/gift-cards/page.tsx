@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Gift, Store, Mail } from "lucide-react";
 import { AnimatedSection } from "@/components/AnimatedSection";
+
+export const metadata: Metadata = {
+  title: "Gift Cards",
+  description:
+    "Give the gift of fresh European pastry. Euro Patisserie Armadale gift cards in any amount — redeemable in-store on pastries, cakes, coffee & catering.",
+  alternates: { canonical: "/gift-cards" },
+};
 
 const AMOUNTS = ["$25", "$50", "$100", "Custom"];
 

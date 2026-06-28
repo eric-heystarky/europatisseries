@@ -8,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { AppFrame } from "@/components/app-frame";
+import { siteUrl, localBusinessJsonLd } from "@/lib/site";
 
 // The brand's own faces. Faro for body/headings, Shorelines for script display.
 const faro = localFont({
@@ -21,16 +22,37 @@ const shorelines = localFont({
   display: "swap",
 });
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : "http://localhost:3000");
-
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "Euro Patisserie Armadale — Order Online",
-  description: "Premium European pastries & catering, made in Armadale. Order pickup or delivery.",
+  title: {
+    default: "Euro Patisserie Armadale — European Pastries, Cakes & Catering",
+    template: "%s | Euro Patisserie Armadale",
+  },
+  description:
+    "Premium European pastries, cakes & catering, freshly made in Armadale. Order online for pickup or delivery.",
+  keywords: [
+    "Euro Patisserie",
+    "Armadale bakery",
+    "patisserie Melbourne",
+    "cakes Armadale",
+    "croissants Armadale",
+    "catering Armadale",
+    "order pastries online",
+  ],
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: "Euro Patisserie Armadale",
+    locale: "en_AU",
+    url: siteUrl,
+    title: "Euro Patisserie Armadale — European Pastries, Cakes & Catering",
+    description: "Freshly made European pastries, cakes & catering in Armadale. Order online for pickup or delivery.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Euro Patisserie Armadale",
+    description: "European pastries, cakes & catering in Armadale. Order online.",
+  },
 };
 
 export default function RootLayout({
@@ -45,6 +67,11 @@ export default function RootLayout({
       className={`${faro.variable} ${shorelines.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        {/* Local-business structured data (Bakery) for local SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd()) }}
+        />
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           <CartProvider>
             <TooltipProvider>
