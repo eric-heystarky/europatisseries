@@ -5,16 +5,16 @@ import Link from "next/link";
 import Script from "next/script";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import { AnimatedSection } from "@/components/AnimatedSection";
 import { FeaturedShowcase } from "@/components/featured-showcase";
 
 const heroCategories = [
-  { name: "Artisan Cakes", image: "https://vibe.filesafe.space/1782359074813107391/attachments/10a71050-16bc-405f-af35-634769e62040.jpg", link: "/pre-order" },
-  { name: "Le Croissant au Beurre", image: "https://vibe.filesafe.space/1782359074813107391/attachments/892503fb-424e-4d41-9419-88f00f047ebb.png", link: "/pre-order" },
-  { name: "Eclairs", image: "https://vibe.filesafe.space/1782359074813107391/attachments/dbaf613c-3e6b-45e0-af7a-e278e2d1a6df.png", link: "/pre-order" },
-  { name: "Focaccia", image: "https://vibe.filesafe.space/1782359074813107391/assets/520e8b0a-5e74-40ed-9fdf-65565b107cb7.png", link: "/pre-order" },
-  { name: "Grab & Go", image: "https://vibe.filesafe.space/1782359074813107391/attachments/eb7ec6d8-d4e7-4f17-af17-289e293329b4.png", link: "/pre-order" },
+  { name: "Artisan Cakes", image: "/images/hero/artisan-cakes.jpg", link: "/pre-order" },
+  { name: "Le Croissant au Beurre", image: "/images/hero/croissant.jpg", link: "/pre-order" },
+  { name: "Eclairs", image: "/images/hero/eclairs.jpg", link: "/pre-order" },
+  { name: "Focaccia", image: "/images/hero/focaccia.jpg", link: "/pre-order" },
+  { name: "Grab & Go", image: "/images/hero/grab-go.jpg", link: "/pre-order" },
 ];
 
 const mobileTiles = [
@@ -50,14 +50,8 @@ export default function Index() {
   });
   const discoverY = useTransform(discoverScroll, [0, 1], ["-10%", "10%"]);
 
+  // Image changes on hover over a collection name (no auto-rotation).
   const [activeHeroIndex, setActiveHeroIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveHeroIndex((prev) => (prev + 1) % heroCategories.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <div className="flex flex-col w-full">
@@ -65,7 +59,7 @@ export default function Index() {
         Euro Patisserie Armadale — European pastries, cakes &amp; catering
       </h1>
       {/* Hero Section */}
-      <section ref={heroRef} className="relative min-h-[100vh] md:min-h-[85vh] w-full border-b-2 border-primary overflow-hidden flex items-center bg-primary">
+      <section ref={heroRef} className="relative min-h-screen w-full border-b-2 border-primary overflow-hidden flex items-center bg-primary">
         {/* Background Images */}
         <AnimatePresence mode="wait">
           <motion.div
