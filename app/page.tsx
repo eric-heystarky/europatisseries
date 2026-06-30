@@ -7,7 +7,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import { useRef, useState, useEffect } from "react";
 import { AnimatedSection } from "@/components/AnimatedSection";
-import { RotatingTileImage } from "@/components/rotating-tile";
+import { FeaturedShowcase } from "@/components/featured-showcase";
 
 const heroCategories = [
   { name: "Artisan Cakes", image: "https://vibe.filesafe.space/1782359074813107391/attachments/10a71050-16bc-405f-af35-634769e62040.jpg", link: "/pre-order" },
@@ -18,20 +18,20 @@ const heroCategories = [
 ];
 
 const mobileTiles = [
-  { title: "WEDDING CAKES", link: "/pre-order" },
-  { title: "LARGE ENTREMETS", link: "/catering" },
-  { title: "SWEET COCKTAIL PIECES", link: "/contact" },
-  { title: "SAVORY COCKTAIL PIECES", link: "/pre-order" },
+  { title: "WEDDING CAKES", link: "/pre-order", image: "/images/catering/piece-montee.jpg" },
+  { title: "LARGE ENTREMETS", link: "/catering", image: "/images/catering/grand-entremets.jpg" },
+  { title: "SWEET COCKTAIL PIECES", link: "/contact", image: "/images/catering/cocktails-sucrees.jpg" },
+  { title: "SAVORY COCKTAIL PIECES", link: "/pre-order", image: "/images/catering/cocktails-salees.jpg" },
 ];
 
 const desktopTiles = [
-  { title: "PIÈCE MONTÉE", link: "/pre-order", span: "col-span-2", aspect: "aspect-[4/3]" },
-  { title: "GRAND ENTREMETS", link: "/catering", span: "col-span-1", aspect: "aspect-[3/4]" },
-  { title: "PIÈCES COCKTAILS SUCRÉES", link: "/contact", span: "col-span-1", aspect: "aspect-[3/4]" },
-  { title: "PIÈCES COCKTAILS SALÉES", link: "/pre-order", span: "col-span-2", aspect: "aspect-[4/3]" },
-  { title: "ECLAIRS", link: "/pre-order", span: "col-span-1", aspect: "aspect-[3/4]" },
-  { title: "GRAB & GO", link: "/pre-order", span: "col-span-1", aspect: "aspect-[3/4]" },
-  { title: "BUFFET", link: "/catering", span: "col-span-2", aspect: "aspect-[4/3]" },
+  { title: "PIÈCE MONTÉE", link: "/pre-order", span: "col-span-2", aspect: "aspect-[4/3]", image: "/images/catering/piece-montee.jpg" },
+  { title: "GRAND ENTREMETS", link: "/catering", span: "col-span-1", aspect: "aspect-[3/4]", image: "/images/catering/grand-entremets.jpg" },
+  { title: "PIÈCES COCKTAILS SUCRÉES", link: "/contact", span: "col-span-1", aspect: "aspect-[3/4]", image: "/images/catering/cocktails-sucrees.jpg" },
+  { title: "PIÈCES COCKTAILS SALÉES", link: "/pre-order", span: "col-span-2", aspect: "aspect-[4/3]", image: "/images/catering/cocktails-salees.jpg" },
+  { title: "ECLAIRS", link: "/pre-order", span: "col-span-1", aspect: "aspect-[3/4]", image: "/images/featured/eclair-over.jpg" },
+  { title: "GRAB & GO", link: "/pre-order", span: "col-span-1", aspect: "aspect-[3/4]", image: "/images/catering/grab-and-go.jpg" },
+  { title: "BUFFET", link: "/catering", span: "col-span-2", aspect: "aspect-[4/3]", image: "/images/catering/buffet.jpg" },
 ];
 
 export default function Index() {
@@ -121,23 +121,8 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Marquee */}
-      <div className="border-b-2 border-primary overflow-hidden py-8 md:py-12 bg-primary text-primary-foreground flex items-center justify-center min-h-[180px] md:min-h-[250px]">
-        <div
-          className="w-[200%] md:w-full"
-          style={{ maskImage: "linear-gradient(to right, transparent, black 10%, black 90%, transparent)" }}
-        >
-          <svg width="100%" height="250" viewBox="0 0 1000 300" preserveAspectRatio="none" className="h-[180px] md:h-[250px]">
-            <path id="mainWavePath" d="M 0 150 Q 250 50 500 150 T 1000 150 T 1500 150 T 2000 150" fill="transparent" stroke="transparent" />
-            <text className="font-sans text-5xl md:text-8xl font-black uppercase tracking-widest" fill="currentColor">
-              <textPath href="#mainWavePath" startOffset="0%">
-                CROISSANTS ★ CROISSANTS ★ CROISSANTS ★ CROISSANTS ★ CROISSANTS ★ CROISSANTS ★
-                <animate attributeName="startOffset" from="0%" to="-50%" begin="0s" dur="15s" repeatCount="indefinite" />
-              </textPath>
-            </text>
-          </svg>
-        </div>
-      </div>
+      {/* Featured creations — curated items with editorial food photography */}
+      <FeaturedShowcase />
 
       {/* Featured Section - Split Screen */}
       <section ref={discoverRef} className="bg-background border-b-2 border-primary relative">
@@ -171,7 +156,8 @@ export default function Index() {
                   {mobileTiles.map((item, i) => (
                     <CarouselItem key={i} className="pl-4 basis-[85%] sm:basis-[70%]">
                       <Link href={item.link} className="group block relative h-[60vh] border-2 border-primary bg-card overflow-hidden">
-                        <RotatingTileImage alt={item.title} seed={i} intervalMs={1000} />
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={item.image} alt={item.title} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                         <div className="absolute bottom-0 left-0 w-full p-6 text-center">
                           <h3 className="font-faro text-white text-sm uppercase tracking-widest">{item.title}</h3>
@@ -190,7 +176,8 @@ export default function Index() {
                 return (
                   <Link key={i} href={item.link} className={`group block relative border-b-2 border-primary ${isLeftColumnSmall ? 'border-r-2' : ''} ${item.span} overflow-hidden`}>
                     <div className={item.aspect}>
-                      <RotatingTileImage alt={item.title} seed={i} intervalMs={1000} />
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={item.image} alt={item.title} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                       <div className="absolute bottom-0 left-0 w-full p-6 text-center">
                         <h3 className="font-faro text-white text-xs md:text-sm font-bold uppercase tracking-widest">{item.title}</h3>

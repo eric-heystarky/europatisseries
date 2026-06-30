@@ -193,3 +193,15 @@
     animation: none;
   }
 }
+
+/* Apple Pay button — only renders in Safari, which honours the -apple-pay-button appearance. */
+.apple-pay-button {
+  display: inline-block;
+  -webkit-appearance: -apple-pay-button;
+  appearance: -apple-pay-button;
+  -apple-pay-button-type: plain;
+  border-radius: 0;
+}
+.apple-pay-button-black {
+  -apple-pay-button-style: black;
+}

@@ -7,6 +7,7 @@ import { useCart, lineUnitPrice, type CartLine } from "./cart-context";
 import { formatPrice } from "@/lib/format";
 import { CardForm, type CardFormHandle } from "./card-form";
 import { AddressAutocomplete } from "./address-autocomplete";
+import { WalletButtons } from "./wallet-buttons";
 import {
   placeOrder,
   quoteDelivery,
@@ -125,31 +126,20 @@ export function Checkout({ currency }: { currency: string }) {
     );
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
+  /** Shared pre-payment checks. Returns an error message, or null if valid. */
+  function validateForm(): string | null {
+    if (!name.trim() || !phone.trim()) return "Please enter your name and phone number.";
+    if (fulfillmentType === "DELIVERY" && !quote)
+      return "Please calculate your delivery fee before paying.";
+    if (timing === "SCHEDULED" && !scheduledAt) return "Please choose a time.";
+    return null;
+  }
 
-    if (!name.trim() || !phone.trim()) {
-      setError("Please enter your name and phone number.");
-      return;
-    }
-    if (fulfillmentType === "DELIVERY" && !quote) {
-      setError("Please calculate your delivery fee before paying.");
-      return;
-    }
-    if (timing === "SCHEDULED" && !scheduledAt) {
-      setError("Please choose a time.");
-      return;
-    }
-
+  /** Place the order with a payment token (from the card field OR a wallet). */
+  async function finalizeOrder(token: string) {
     setSubmitting(true);
+    setError(null);
     try {
-      const token = await cardRef.current?.tokenize();
-      if (!token) {
-        setSubmitting(false);
-        return;
-      }
-
       const res = await placeOrder({
         sourceId: token,
         lines,
@@ -181,6 +171,25 @@ export function Checkout({ currency }: { currency: string }) {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setSubmitting(true);
+    const token = await cardRef.current?.tokenize();
+    if (!token) {
+      setSubmitting(false);
+      return;
+    }
+    await finalizeOrder(token);
   }
 
   const Toggle = ({
@@ -307,6 +316,15 @@ export function Checkout({ currency }: { currency: string }) {
           <label className="text-xs font-bold uppercase tracking-[0.18em]">Order note (optional)</label>
           <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. leave at door" className="field-brutal mt-1" />
         </div>
+
+        {/* Express checkout — Google Pay / Apple Pay (shown only where supported) */}
+        <WalletButtons
+          amountCents={estimatedTotalCents}
+          currency={currency}
+          validate={validateForm}
+          onToken={finalizeOrder}
+          onError={setError}
+        />
 
         {/* Card */}
         <div>
