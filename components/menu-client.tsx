@@ -155,18 +155,31 @@ export function MenuClient({ menu }: { menu: Menu }) {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
                     transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1], delay: (i % 3) * 0.07 }}
-                    className="flex flex-col border-2 border-border bg-card transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_hsl(var(--primary))]"
+                    className="group/item flex flex-col border-2 border-border bg-card transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_hsl(var(--primary))]"
                   >
-                    {item.imageUrl && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={item.imageUrl}
-                        alt={item.name}
-                        loading="lazy"
-                        decoding="async"
-                        className="aspect-square w-full border-b-2 border-border object-cover transition duration-500"
-                      />
-                    )}
+                    {/* Photo + add-to-cart button revealed on hover */}
+                    <div className="relative aspect-square w-full overflow-hidden border-b-2 border-border bg-card">
+                      {item.imageUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={item.imageUrl}
+                          alt={item.name}
+                          loading="lazy"
+                          decoding="async"
+                          className="h-full w-full object-cover transition duration-500 group-hover/item:scale-105"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-5xl font-light text-primary/20">
+                          +
+                        </div>
+                      )}
+                      <button
+                        onClick={() => setActiveItem(item)}
+                        className="absolute inset-x-0 bottom-0 translate-y-full bg-primary/90 py-3.5 text-center text-xs font-bold uppercase tracking-[0.18em] text-primary-foreground opacity-0 backdrop-blur-sm transition-all duration-300 group-hover/item:translate-y-0 group-hover/item:opacity-100"
+                      >
+                        {hasOptions ? "Choose Options" : "Add to Cart"}
+                      </button>
+                    </div>
                     <div className="flex flex-1 flex-col p-5">
                       <div className="flex items-baseline justify-between gap-3">
                         <h3 className="font-serif text-xl font-semibold">{item.name}</h3>
@@ -178,9 +191,6 @@ export function MenuClient({ menu }: { menu: Menu }) {
                       {item.description && (
                         <p className="mt-1 flex-1 text-sm text-muted-foreground">{item.description}</p>
                       )}
-                      <button onClick={() => setActiveItem(item)} className="btn-brutal mt-5 py-2.5 text-xs">
-                        {hasOptions ? "Choose options" : "Add to cart"}
-                      </button>
                     </div>
                   </motion.article>
                 );
