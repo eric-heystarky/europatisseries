@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Search, X } from "lucide-react";
 import type { Menu, MenuItem } from "@/lib/menu";
 import { formatPrice, slugify } from "@/lib/format";
 import { useCart } from "./cart-context";
@@ -10,30 +9,19 @@ import { ItemDialog } from "./item-dialog";
 
 export function MenuClient({ menu }: { menu: Menu }) {
   const [activeItem, setActiveItem] = useState<MenuItem | null>(null);
-  const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const { count, subtotalCents, openDrawer } = useCart();
 
-  const q = query.trim().toLowerCase();
+  // Show the selected category, or every category when "All" is active.
+  const visibleCategories = useMemo(
+    () =>
+      menu.categories.filter(
+        (c) => (activeCategory === "all" || c.id === activeCategory) && c.items.length > 0,
+      ),
+    [menu.categories, activeCategory],
+  );
 
-  // Apply the category filter + text search, dropping empty categories.
-  const visibleCategories = useMemo(() => {
-    return menu.categories
-      .filter((c) => activeCategory === "all" || c.id === activeCategory)
-      .map((c) => ({
-        ...c,
-        items: c.items.filter(
-          (it) =>
-            !q ||
-            it.name.toLowerCase().includes(q) ||
-            it.description.toLowerCase().includes(q),
-        ),
-      }))
-      .filter((c) => c.items.length > 0);
-  }, [menu.categories, activeCategory, q]);
-
-  const resultCount = visibleCategories.reduce((n, c) => n + c.items.length, 0);
-  const isFiltering = q !== "" || activeCategory !== "all";
+  const isFiltering = activeCategory !== "all";
 
   return (
     <>
@@ -42,36 +30,16 @@ export function MenuClient({ menu }: { menu: Menu }) {
         <p className="text-xs uppercase tracking-[0.35em] text-primary-foreground/60">
           Les Collections
         </p>
-        <h1 className="font-display text-7xl leading-none md:text-8xl">pre-order</h1>
+        <h1 className="font-display text-7xl leading-none md:text-8xl">menu</h1>
         <p className="mx-auto mt-4 max-w-md text-sm uppercase tracking-[0.15em] text-primary-foreground/70">
           Premium European pastries & catering, made in Armadale. Pickup or delivery.
         </p>
       </section>
 
-      {/* Sticky search + category filter toolbar */}
+      {/* Sticky category tabs */}
       <div className="sticky top-[102px] z-30 border-b-2 border-border bg-background/95 backdrop-blur md:top-[120px]">
         <div className="mx-auto max-w-6xl px-5 py-3">
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search the menu…"
-              aria-label="Search the menu"
-              className="field-brutal pl-9 pr-9"
-            />
-            {query && (
-              <button
-                onClick={() => setQuery("")}
-                aria-label="Clear search"
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-primary"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
-
-          <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+          <div className="flex gap-2 overflow-x-auto pb-1">
             <CategoryPill active={activeCategory === "all"} onClick={() => setActiveCategory("all")}>
               All
             </CategoryPill>
@@ -89,21 +57,9 @@ export function MenuClient({ menu }: { menu: Menu }) {
       </div>
 
       <div className="mx-auto max-w-6xl px-5 pb-24">
-        {isFiltering && (
-          <p className="pt-6 text-xs uppercase tracking-[0.15em] text-muted-foreground">
-            {resultCount} {resultCount === 1 ? "item" : "items"}
-            {q && (
-              <>
-                {" "}
-                for “<span className="text-foreground">{query}</span>”
-              </>
-            )}
-          </p>
-        )}
-
         {visibleCategories.length === 0 && (
           <p className="py-20 text-center uppercase tracking-[0.15em] text-muted-foreground">
-            No items match your search.
+            No items available right now.
           </p>
         )}
 

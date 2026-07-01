@@ -6,7 +6,7 @@ import { MenuClient } from "@/components/menu-client";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Order Pastries & Cakes Online",
+  title: "Menu — Order Pastries & Cakes Online",
   description:
     "Browse the full Euro Patisserie menu — croissants, cakes, tarts, quiches, macarons & more. Order online for pickup or delivery in Armadale.",
   alternates: { canonical: "/pre-order" },
