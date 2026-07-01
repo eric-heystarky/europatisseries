@@ -1,76 +1,124 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { Menu, MenuItem } from "@/lib/menu";
-import { formatPrice, slugify } from "@/lib/format";
+import { formatPrice } from "@/lib/format";
 import { useCart } from "./cart-context";
 import { ItemDialog } from "./item-dialog";
 
 export function MenuClient({ menu }: { menu: Menu }) {
   const [activeItem, setActiveItem] = useState<MenuItem | null>(null);
-  const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [openId, setOpenId] = useState<string | null>(null);
   const { count, subtotalCents, openDrawer } = useCart();
+  const contentRef = useRef<HTMLDivElement>(null);
 
-  // Show the selected category, or every category when "All" is active.
-  const visibleCategories = useMemo(
-    () =>
-      menu.categories.filter(
-        (c) => (activeCategory === "all" || c.id === activeCategory) && c.items.length > 0,
-      ),
-    [menu.categories, activeCategory],
-  );
+  const openCategory = menu.categories.find((c) => c.id === openId) ?? null;
 
-  const isFiltering = activeCategory !== "all";
+  const goTo = (id: string | null) => {
+    setOpenId(id);
+    requestAnimationFrame(() =>
+      contentRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
+    );
+  };
 
   return (
     <>
       {/* Hero */}
       <section className="border-b-2 border-border bg-primary px-5 py-20 text-center text-primary-foreground">
-        <p className="text-xs uppercase tracking-[0.35em] text-primary-foreground/60">
-          Les Collections
-        </p>
+        <p className="text-xs uppercase tracking-[0.35em] text-primary-foreground/60">Les Collections</p>
         <h1 className="font-display text-7xl leading-none md:text-8xl">menu</h1>
         <p className="mx-auto mt-4 max-w-md text-sm uppercase tracking-[0.15em] text-primary-foreground/70">
-          Premium European pastries & catering, made in Armadale. Pickup or delivery.
+          Premium European pastries &amp; catering, made in Armadale. Pickup or delivery.
         </p>
       </section>
 
-      {/* Sticky category tabs */}
-      <div className="sticky top-[102px] z-30 border-b-2 border-border bg-background/95 backdrop-blur md:top-[120px]">
-        <div className="mx-auto max-w-6xl px-5 py-3">
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            <CategoryPill active={activeCategory === "all"} onClick={() => setActiveCategory("all")}>
-              All
-            </CategoryPill>
-            {menu.categories.map((c) => (
-              <CategoryPill
-                key={c.id}
-                active={activeCategory === c.id}
-                onClick={() => setActiveCategory(c.id)}
-              >
-                {c.name}
-              </CategoryPill>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="mx-auto max-w-6xl px-5 pb-24">
-        {visibleCategories.length === 0 && (
-          <p className="py-20 text-center uppercase tracking-[0.15em] text-muted-foreground">
-            No items available right now.
-          </p>
-        )}
-
-        {visibleCategories.map((category) => (
-          <section key={category.id} id={slugify(category.name)} className="scroll-mt-44 pt-16">
-            <h2 className="border-b-2 border-border pb-3 font-serif text-3xl font-semibold uppercase tracking-wide md:text-4xl">
-              {category.name}
+      <div ref={contentRef} className="mx-auto max-w-4xl scroll-mt-[110px] px-5 pb-24 md:scroll-mt-[128px]">
+        {!openCategory ? (
+          /* ───────── Browse by category ───────── */
+          <>
+            <h2 className="pt-10 font-serif text-2xl font-semibold uppercase tracking-wide md:text-3xl">
+              Browse by category
             </h2>
-            {/* Mobile: Square-style tappable rows (text left, thumbnail right) */}
+
+            {menu.categories.length === 0 ? (
+              <p className="py-20 text-center uppercase tracking-[0.15em] text-muted-foreground">
+                No items available right now.
+              </p>
+            ) : (
+              <div className="mt-6 grid gap-5 sm:grid-cols-2">
+                {menu.categories.map((cat) => {
+                  const img = cat.items.find((i) => i.imageUrl)?.imageUrl;
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => goTo(cat.id)}
+                      className="group relative flex aspect-[16/10] w-full flex-col justify-end overflow-hidden border-2 border-border bg-primary text-left text-primary-foreground transition hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_hsl(var(--primary))]"
+                    >
+                      {img && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={img}
+                          alt=""
+                          aria-hidden
+                          loading="lazy"
+                          className="absolute inset-0 h-full w-full object-cover opacity-70 transition duration-500 group-hover:scale-105"
+                        />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/50 to-transparent" />
+                      <div className="relative z-10 flex items-end justify-between gap-3 p-5">
+                        <div className="min-w-0">
+                          <h3 className="font-shorelines text-3xl leading-none md:text-4xl">{cat.name}</h3>
+                          <p className="mt-1 text-xs font-bold uppercase tracking-[0.15em] text-primary-foreground/70">
+                            {cat.items.length} {cat.items.length === 1 ? "item" : "items"}
+                          </p>
+                        </div>
+                        <ArrowRight className="h-5 w-5 flex-none transition group-hover:translate-x-1" />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Contact */}
+            <section id="contact" className="mt-20 scroll-mt-44 border-t-2 border-border pt-16">
+              <h2 className="font-serif text-3xl font-semibold uppercase tracking-wide">Visit Us</h2>
+              <div className="mt-6 grid gap-6 text-sm md:grid-cols-3">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Address</p>
+                  <p className="mt-2">974 High St, Armadale VIC 3143</p>
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Hours</p>
+                  <p className="mt-2">Tues–Sun · 7am–3pm</p>
+                  <p>Monday · Closed</p>
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Contact</p>
+                  <p className="mt-2">hello@europatisserie.com</p>
+                  <p>(03) 9822 1234</p>
+                </div>
+              </div>
+            </section>
+          </>
+        ) : (
+          /* ───────── Selected category ───────── */
+          <>
+            <button
+              onClick={() => goTo(null)}
+              className="mt-8 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] hover:underline"
+            >
+              <ArrowLeft className="h-4 w-4" /> All categories
+            </button>
+            <h2 className="mt-4 border-b-2 border-border pb-3 font-serif text-3xl font-semibold uppercase tracking-wide md:text-4xl">
+              {openCategory.name}
+            </h2>
+
+            {/* Mobile: Square-style tappable rows */}
             <ul className="mt-4 border-t-2 border-border md:hidden">
-              {category.items.map((item) => {
+              {openCategory.items.map((item) => {
                 const prices = item.variations.map((v) => v.priceCents);
                 const min = prices.length ? Math.min(...prices) : 0;
                 const multi = item.variations.length > 1;
@@ -121,9 +169,9 @@ export function MenuClient({ menu }: { menu: Menu }) {
               })}
             </ul>
 
-            {/* Tablet & desktop: 3-up grid with square-cropped photos */}
+            {/* Tablet & desktop: grid with photos */}
             <div className="mt-8 hidden gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">
-              {category.items.map((item, i) => {
+              {openCategory.items.map((item, i) => {
                 const prices = item.variations.map((v) => v.priceCents);
                 const min = prices.length ? Math.min(...prices) : 0;
                 const multi = item.variations.length > 1;
@@ -156,14 +204,9 @@ export function MenuClient({ menu }: { menu: Menu }) {
                         </span>
                       </div>
                       {item.description && (
-                        <p className="mt-1 flex-1 text-sm text-muted-foreground">
-                          {item.description}
-                        </p>
+                        <p className="mt-1 flex-1 text-sm text-muted-foreground">{item.description}</p>
                       )}
-                      <button
-                        onClick={() => setActiveItem(item)}
-                        className="btn-brutal mt-5 py-2.5 text-xs"
-                      >
+                      <button onClick={() => setActiveItem(item)} className="btn-brutal mt-5 py-2.5 text-xs">
                         {hasOptions ? "Choose options" : "Add to cart"}
                       </button>
                     </div>
@@ -171,37 +214,14 @@ export function MenuClient({ menu }: { menu: Menu }) {
                 );
               })}
             </div>
-          </section>
-        ))}
-
-        {/* Contact — only on the unfiltered view */}
-        {!isFiltering && (
-          <section id="contact" className="scroll-mt-44 border-t-2 border-border pt-16 mt-20">
-            <h2 className="font-serif text-3xl font-semibold uppercase tracking-wide">Visit Us</h2>
-            <div className="mt-6 grid gap-6 text-sm md:grid-cols-3">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Address</p>
-                <p className="mt-2">974 High St, Armadale VIC 3143</p>
-              </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Hours</p>
-                <p className="mt-2">Tues–Sun · 7am–3pm</p>
-                <p>Monday · Closed</p>
-              </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Contact</p>
-                <p className="mt-2">hello@europatisserie.com</p>
-                <p>(03) 9822 1234</p>
-              </div>
-            </div>
-          </section>
+          </>
         )}
       </div>
 
       {/* Floating cart bar */}
       {count > 0 && (
         <div className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-border bg-background">
-          <div className="mx-auto max-w-6xl px-5 py-3">
+          <div className="mx-auto max-w-4xl px-5 py-3">
             <button onClick={openDrawer} className="btn-brutal w-full justify-between px-4 py-3 text-sm">
               <span className="flex items-center gap-2">
                 <span className="inline-flex h-6 min-w-6 items-center justify-center bg-primary-foreground px-1.5 text-xs text-primary tabular-nums">
@@ -216,33 +236,8 @@ export function MenuClient({ menu }: { menu: Menu }) {
       )}
 
       {activeItem && (
-        <ItemDialog
-          item={activeItem}
-          currency={menu.currency}
-          onClose={() => setActiveItem(null)}
-        />
+        <ItemDialog item={activeItem} currency={menu.currency} onClose={() => setActiveItem(null)} />
       )}
     </>
-  );
-}
-
-function CategoryPill({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`min-h-11 whitespace-nowrap border-2 border-border px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] transition ${
-        active ? "bg-primary text-primary-foreground" : "bg-card hover:bg-primary/10"
-      }`}
-    >
-      {children}
-    </button>
   );
 }
