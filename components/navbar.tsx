@@ -13,6 +13,9 @@ import { useCart } from "./cart-context";
 const LOGO =
   "https://vibe.filesafe.space/1782359074813107391/attachments/7e2aeccd-b174-447b-90d6-578c90242df0.png";
 
+const DOG_IMG =
+  "https://vibe.filesafe.space/1782359074813107391/attachments/17124f1b-7f7c-4903-94c7-7d24968b1d60.png";
+
 export function Navbar() {
   const pathname = usePathname();
   const { scrollY } = useScroll();
@@ -29,7 +32,9 @@ export function Navbar() {
     { name: "CATERING", path: "/catering" },
     { name: "GIFT CARDS", path: "/gift-cards" },
     { name: "ABOUT", path: "/about" },
+    { name: "OUR CRAFT", path: "/our-craft" },
     { name: "FAQ", path: "/faq" },
+    { name: "DOG FRIENDLY", path: "/dog-friendly" },
     { name: "JOIN THE TEAM", path: "/join-team" },
     { name: "CONTACT", path: "/contact" },
   ];
@@ -109,18 +114,25 @@ export function Navbar() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.4 }}
-                    className="w-full aspect-square relative my-4 border-2 border-primary overflow-hidden"
+                    className="w-full my-4"
                   >
-                    <img
-                      src="https://vibe.filesafe.space/1782359074813107391/attachments/10a71050-16bc-405f-af35-634769e62040.jpg"
-                      alt="Collection"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/20" />
-                    <div className="absolute bottom-4 left-4">
-                      <p className="text-white text-xs font-bold tracking-widest uppercase">COLLECTION</p>
-                      <p className="text-white text-sm font-faro">Chocolats</p>
-                    </div>
+                    <SheetClose asChild>
+                      <Link
+                        href="/dog-friendly"
+                        className="group relative block aspect-square w-full overflow-hidden border-2 border-primary"
+                      >
+                        <img
+                          src={DOG_IMG}
+                          alt="We're dog friendly"
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-black/25" />
+                        <div className="absolute bottom-4 left-4">
+                          <p className="text-white text-xs font-bold tracking-widest uppercase">We&apos;re</p>
+                          <p className="text-white text-sm font-faro">Dog Friendly 🐾</p>
+                        </div>
+                      </Link>
+                    </SheetClose>
                   </motion.div>
 
                   {/* Mobile-only social and search links */}
@@ -160,9 +172,12 @@ export function Navbar() {
                 src={LOGO}
                 alt="Euro Patisserie"
                 className={`h-full max-h-[45px] md:max-h-[60px] object-contain transition-all duration-300 ${
-                  // Over the dark hero (home, not scrolled): keep the logo white.
+                  // Over the hero (home, not scrolled): white on the dark hero in light
+                  // mode; dark in dark mode (where the hero flips light).
                   // On the solid bar: navy in light mode, white in dark mode.
-                  isHomePage && !isScrolled ? "" : "brightness-0 dark:invert"
+                  isHomePage && !isScrolled
+                    ? "brightness-0 invert dark:invert-0"
+                    : "brightness-0 dark:invert"
                 }`}
               />
             </Link>

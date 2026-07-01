@@ -11,27 +11,27 @@ const LOGO =
 export function Footer() {
   return (
     <footer className="border-t-2 border-primary bg-background text-primary">
-      {/* Features Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border-b-2 border-primary">
-        <div className="flex flex-col items-center text-center p-12 border-b-2 md:border-b-0 md:border-r-2 border-primary">
-          <Bike className="w-8 h-8 mb-6" strokeWidth={1} />
-          <h4 className="font-bold tracking-widest uppercase mb-4 text-sm">DELIVERY (D+1)</h4>
-          <p className="text-sm font-medium opacity-80">By courier</p>
+      {/* Features Section — 2x2 on mobile, single row on large screens */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 border-b-2 border-primary">
+        <div className="flex flex-col items-center text-center p-6 md:p-12 border-r-2 border-b-2 lg:border-b-0 border-primary">
+          <Bike className="w-7 h-7 md:w-8 md:h-8 mb-4 md:mb-6" strokeWidth={1} />
+          <h4 className="font-bold tracking-widest uppercase mb-2 md:mb-4 text-xs md:text-sm">DELIVERY (D+1)</h4>
+          <p className="text-xs md:text-sm font-medium opacity-80">By courier</p>
         </div>
-        <div className="flex flex-col items-center text-center p-12 border-b-2 md:border-b-0 lg:border-r-2 border-primary">
-          <Store className="w-8 h-8 mb-6" strokeWidth={1} />
-          <h4 className="font-bold tracking-widest uppercase mb-4 text-sm">IN-STORE PURCHASE</h4>
-          <p className="text-sm font-medium opacity-80">Tues-Sun 7AM - 3PM</p>
+        <div className="flex flex-col items-center text-center p-6 md:p-12 border-b-2 lg:border-b-0 lg:border-r-2 border-primary">
+          <Store className="w-7 h-7 md:w-8 md:h-8 mb-4 md:mb-6" strokeWidth={1} />
+          <h4 className="font-bold tracking-widest uppercase mb-2 md:mb-4 text-xs md:text-sm">IN-STORE PURCHASE</h4>
+          <p className="text-xs md:text-sm font-medium opacity-80">Tues-Sun 7AM - 3PM</p>
         </div>
-        <div className="flex flex-col items-center text-center p-12 border-b-2 md:border-b-0 md:border-r-2 border-primary">
-          <MapPin className="w-8 h-8 mb-6" strokeWidth={1} />
-          <h4 className="font-bold tracking-widest uppercase mb-4 text-sm">CLICK & COLLECT</h4>
-          <p className="text-sm font-medium opacity-80">Order today before 8PM and collect tomorrow from 10AM</p>
+        <div className="flex flex-col items-center text-center p-6 md:p-12 border-r-2 border-primary">
+          <MapPin className="w-7 h-7 md:w-8 md:h-8 mb-4 md:mb-6" strokeWidth={1} />
+          <h4 className="font-bold tracking-widest uppercase mb-2 md:mb-4 text-xs md:text-sm">CLICK & COLLECT</h4>
+          <p className="text-xs md:text-sm font-medium opacity-80">Order today before 8PM and collect tomorrow from 10AM</p>
         </div>
-        <div className="flex flex-col items-center text-center p-12">
-          <Lock className="w-8 h-8 mb-6" strokeWidth={1} />
-          <h4 className="font-bold tracking-widest uppercase mb-4 text-sm">SECURE PAYMENT</h4>
-          <p className="text-sm font-medium opacity-80">Protected payments ensuring a secure experience.</p>
+        <div className="flex flex-col items-center text-center p-6 md:p-12">
+          <Lock className="w-7 h-7 md:w-8 md:h-8 mb-4 md:mb-6" strokeWidth={1} />
+          <h4 className="font-bold tracking-widest uppercase mb-2 md:mb-4 text-xs md:text-sm">SECURE PAYMENT</h4>
+          <p className="text-xs md:text-sm font-medium opacity-80">Protected payments ensuring a secure experience.</p>
         </div>
       </div>
 
