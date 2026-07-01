@@ -159,15 +159,32 @@ export function MenuClient({ menu }: { menu: Menu }) {
                   >
                     {/* Photo + add-to-cart button revealed on hover */}
                     <div className="relative aspect-square w-full overflow-hidden border-b-2 border-border bg-card">
-                      {item.imageUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={item.imageUrl}
-                          alt={item.name}
-                          loading="lazy"
-                          decoding="async"
-                          className="h-full w-full object-cover transition duration-500 group-hover/item:scale-105"
-                        />
+                      {item.imageUrls.length > 0 ? (
+                        <>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={item.imageUrls[0]}
+                            alt={item.name}
+                            loading="lazy"
+                            decoding="async"
+                            className={`h-full w-full object-cover transition duration-500 ${
+                              item.imageUrls[1]
+                                ? "group-hover/item:opacity-0"
+                                : "group-hover/item:scale-105"
+                            }`}
+                          />
+                          {item.imageUrls[1] && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={item.imageUrls[1]}
+                              alt=""
+                              aria-hidden
+                              loading="lazy"
+                              decoding="async"
+                              className="absolute inset-0 h-full w-full object-cover opacity-0 transition duration-500 group-hover/item:opacity-100"
+                            />
+                          )}
+                        </>
                       ) : (
                         <div className="flex h-full w-full items-center justify-center text-5xl font-light text-primary/20">
                           +

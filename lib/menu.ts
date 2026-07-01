@@ -37,6 +37,8 @@ export type MenuItem = {
   name: string;
   description: string;
   imageUrl: string | null;
+  /** All item photos (first is the primary; a second enables hover-swap). */
+  imageUrls: string[];
   variations: MenuVariation[];
   modifierLists: MenuModifierList[];
 };
@@ -156,14 +158,17 @@ export async function getMenu(): Promise<Menu> {
       });
     }
 
-    const imageId = data.imageIds?.[0];
-    const imageUrl = (imageId && imageUrlById.get(imageId)) || null;
+    // All photos on the item (in Square's order); the second one drives hover-swap.
+    const imageUrls = (data.imageIds ?? [])
+      .map((id) => imageUrlById.get(id))
+      .filter((url): url is string => !!url);
 
     const item: MenuItem = {
       id: obj.id,
       name: data.name ?? "Untitled",
       description: data.description ?? "",
-      imageUrl,
+      imageUrl: imageUrls[0] ?? null,
+      imageUrls,
       variations,
       modifierLists,
     };
