@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import type { Menu, MenuItem } from "@/lib/menu";
+import type { Menu, MenuItem, MenuCategory } from "@/lib/menu";
 import { formatPrice } from "@/lib/format";
 import { useCart } from "./cart-context";
 import { ItemDialog } from "./item-dialog";
@@ -48,37 +48,9 @@ export function MenuClient({ menu }: { menu: Menu }) {
               </p>
             ) : (
               <div className="mt-6 grid gap-5 sm:grid-cols-2">
-                {menu.categories.map((cat) => {
-                  const img = cat.items.find((i) => i.imageUrl)?.imageUrl;
-                  return (
-                    <button
-                      key={cat.id}
-                      onClick={() => goTo(cat.id)}
-                      className="group relative flex aspect-[16/10] w-full flex-col justify-end overflow-hidden border-2 border-border bg-primary text-left text-primary-foreground transition hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_hsl(var(--primary))]"
-                    >
-                      {img && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={img}
-                          alt=""
-                          aria-hidden
-                          loading="lazy"
-                          className="absolute inset-0 h-full w-full object-cover opacity-70 transition duration-500 group-hover:scale-105"
-                        />
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/50 to-transparent" />
-                      <div className="relative z-10 flex items-end justify-between gap-3 p-5">
-                        <div className="min-w-0">
-                          <h3 className="font-shorelines text-3xl leading-none md:text-4xl">{cat.name}</h3>
-                          <p className="mt-1 text-xs font-bold uppercase tracking-[0.15em] text-primary-foreground/70">
-                            {cat.items.length} {cat.items.length === 1 ? "item" : "items"}
-                          </p>
-                        </div>
-                        <ArrowRight className="h-5 w-5 flex-none transition group-hover:translate-x-1" />
-                      </div>
-                    </button>
-                  );
-                })}
+                {menu.categories.map((cat) => (
+                  <CategoryCard key={cat.id} category={cat} onOpen={() => goTo(cat.id)} />
+                ))}
               </div>
             )}
 
@@ -239,5 +211,66 @@ export function MenuClient({ menu }: { menu: Menu }) {
         <ItemDialog item={activeItem} currency={menu.currency} onClose={() => setActiveItem(null)} />
       )}
     </>
+  );
+}
+
+/** A category "folder" card. On desktop, the cursor becomes a round arrow button. */
+function CategoryCard({ category, onOpen }: { category: MenuCategory; onOpen: () => void }) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const [hover, setHover] = useState(false);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const img = category.items.find((i) => i.imageUrl)?.imageUrl;
+
+  const track = (e: React.MouseEvent) => {
+    const rect = ref.current?.getBoundingClientRect();
+    if (rect) setPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
+
+  return (
+    <button
+      ref={ref}
+      onClick={onOpen}
+      onMouseEnter={(e) => {
+        setHover(true);
+        track(e);
+      }}
+      onMouseLeave={() => setHover(false)}
+      onMouseMove={track}
+      className="group relative flex aspect-[16/10] w-full flex-col justify-end overflow-hidden border-2 border-border bg-primary text-left text-primary-foreground transition hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_hsl(var(--primary))] md:cursor-none"
+    >
+      {img && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={img}
+          alt=""
+          aria-hidden
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-cover opacity-70 transition duration-500 group-hover:scale-105"
+        />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/50 to-transparent" />
+
+      {/* Cursor-following arrow button (desktop only) */}
+      <span
+        aria-hidden
+        style={{ left: pos.x, top: pos.y }}
+        className={`pointer-events-none absolute z-20 hidden h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-primary-foreground text-primary shadow-lg transition-opacity duration-200 md:flex ${
+          hover ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <ArrowRight className="h-5 w-5" />
+      </span>
+
+      <div className="relative z-10 flex items-end justify-between gap-3 p-5">
+        <div className="min-w-0">
+          <h3 className="font-shorelines text-3xl leading-none md:text-4xl">{category.name}</h3>
+          <p className="mt-1 text-xs font-bold uppercase tracking-[0.15em] text-primary-foreground/70">
+            {category.items.length} {category.items.length === 1 ? "item" : "items"}
+          </p>
+        </div>
+        {/* Static arrow for touch devices (desktop uses the cursor button). */}
+        <ArrowRight className="h-5 w-5 flex-none md:hidden" />
+      </div>
+    </button>
   );
 }
