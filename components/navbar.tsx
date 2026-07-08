@@ -29,6 +29,7 @@ export function Navbar() {
 
   const primaryNavLinks = [
     { name: "MENU", path: "/pre-order" },
+    { name: "CAFÉ", path: "/cafe" },
     { name: "CATERING", path: "/catering" },
     { name: "GIFT CARDS", path: "/gift-cards" },
     { name: "ABOUT", path: "/about" },
