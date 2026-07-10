@@ -12,7 +12,7 @@ import { WhyEuro } from "@/components/why-euro";
 
 const heroCategories = [
   { name: "Artisan Cakes", image: "/images/hero/artisan-cakes.jpg", link: "/pre-order" },
-  { name: "Le Croissant au Beurre", image: "/images/hero/croissant.jpg", link: "/pre-order" },
+  { name: "Le Croissant", image: "/images/hero/croissant.jpg", link: "/pre-order" },
   { name: "Eclairs", image: "/images/hero/eclairs.jpg", link: "/pre-order" },
   { name: "Focaccia", image: "/images/hero/focaccia.jpg", link: "/pre-order" },
   { name: "Grab & Go", image: "/images/hero/grab-go.jpg", link: "/pre-order" },
