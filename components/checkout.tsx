@@ -29,7 +29,14 @@ export function Checkout({ currency }: { currency: string }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [addr, setAddr] = useState({ line1: "", line2: "", locality: "", region: "", postalCode: "" });
+  const [addr, setAddr] = useState<{
+    line1: string;
+    line2: string;
+    locality: string;
+    region: string;
+    postalCode: string;
+    coords?: { lat: number; lon: number };
+  }>({ line1: "", line2: "", locality: "", region: "", postalCode: "" });
   const [note, setNote] = useState("");
 
   const [quote, setQuote] = useState<Quote | null>(null);
@@ -43,8 +50,10 @@ export function Checkout({ currency }: { currency: string }) {
     setQuote(null);
   }, [addr, lines, fulfillmentType]);
 
-  const setAddrField = (field: keyof typeof addr, value: string) =>
-    setAddr((prev) => ({ ...prev, [field]: value }));
+  // Manual edits invalidate any coordinates captured from an autocomplete pick,
+  // so the quote re-geocodes the edited address instead of using stale coords.
+  const setAddrField = (field: "line1" | "line2" | "locality" | "region" | "postalCode", value: string) =>
+    setAddr((prev) => ({ ...prev, [field]: value, coords: undefined }));
 
   const deliveryFeeCents = fulfillmentType === "DELIVERY" && quote ? quote.feeCents : 0;
   const estimatedTotalCents = subtotalCents + deliveryFeeCents;
@@ -64,6 +73,7 @@ export function Checkout({ currency }: { currency: string }) {
           locality: addr.locality.trim(),
           region: addr.region.trim(),
           postalCode: addr.postalCode.trim(),
+          coords: addr.coords,
         },
         lines,
       );

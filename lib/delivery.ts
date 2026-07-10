@@ -33,6 +33,8 @@ export type DeliveryAddress = {
   locality: string;
   region: string;
   postalCode: string;
+  /** Exact coordinates from address autocomplete, when available — skips geocoding. */
+  coords?: { lat: number; lon: number };
 };
 
 export type DeliveryQuote = {
@@ -187,6 +189,25 @@ async function osmDistance(
  * a user-friendly Error if the address can't be located or routed by any provider.
  */
 export async function getDeliveryQuote(address: DeliveryAddress): Promise<DeliveryQuote> {
+  // Most accurate: if the client picked an autocomplete suggestion we already
+  // have exact coordinates — route straight from them, skipping geocoding.
+  if (address.coords) {
+    try {
+      const km = await drivingDistanceKm(address.coords);
+      if (km != null) {
+        const { billedKm, feeCents } = deliveryFeeForKm(km);
+        return {
+          distanceKm: Math.round(km * 100) / 100,
+          billedKm,
+          feeCents,
+          resolvedAddress: addressToQuery(address),
+        };
+      }
+    } catch {
+      // Fall through to the address-string providers below.
+    }
+  }
+
   let km = await googleDrivingDistanceKm(address);
   let resolvedAddress = addressToQuery(address);
 
