@@ -1,6 +1,6 @@
 import "server-only";
 import { unstable_cache } from "next/cache";
-import { square } from "./square";
+import { square, SQUARE_LOCATION_ID } from "./square";
 import type { Square } from "square";
 
 /** Cache tag used by the Square webhook to invalidate the menu on change. */
@@ -57,6 +57,46 @@ export type Menu = {
 const UNCATEGORIZED = "__uncategorized__";
 
 /**
+ * Categories that exist in the in-store POS catalog but shouldn't appear on the
+ * public ordering site — internal POS buttons, retail goods, and alcohol (which
+ * needs liquor licensing / age verification to sell online). Matched by name,
+ * case-insensitive. The items stay untouched in Square; they're just not shown.
+ */
+const HIDDEN_CATEGORIES = new Set([
+  "capping machine",
+  "retail",
+  "alcoholic beverages",
+]);
+
+/** Fetch every page of a catalog search, accumulating objects + related objects. */
+async function searchAllCatalog(request: Parameters<typeof square.catalog.search>[0]) {
+  const objects: Square.CatalogObject[] = [];
+  const related: Square.CatalogObject[] = [];
+  let cursor: string | undefined;
+  do {
+    const resp = await square.catalog.search({ ...request, cursor });
+    if (resp.objects) objects.push(...resp.objects);
+    if (resp.relatedObjects) related.push(...resp.relatedObjects);
+    cursor = resp.cursor ?? undefined;
+  } while (cursor);
+  return { objects, related };
+}
+
+/**
+ * Whether a catalog object is sold at our location. This Square account is
+ * shared with another business (a second location), so items must be filtered
+ * to SQUARE_LOCATION_ID — otherwise the other location's menu leaks onto the
+ * site. With no location configured, nothing is filtered (single-location).
+ */
+function isAtLocation(obj: Square.CatalogObject): boolean {
+  if (!SQUARE_LOCATION_ID) return true;
+  if (obj.presentAtAllLocations) {
+    return !(obj.absentAtLocationIds ?? []).includes(SQUARE_LOCATION_ID);
+  }
+  return (obj.presentAtLocationIds ?? []).includes(SQUARE_LOCATION_ID);
+}
+
+/**
  * Fetch the full catalog from Square and shape it into a category → item →
  * variation/modifier tree ready for display.
  */
@@ -65,27 +105,27 @@ export async function getMenu(): Promise<Menu> {
   // fetched separately: `includeRelatedObjects` only returns an item's
   // `reporting_category`, not the categories linked via its `categories[]`
   // array, so we'd otherwise have category ids with no names.
-  const [response, categoryResponse] = await Promise.all([
-    square.catalog.search({
+  const [itemResult, categoryResult] = await Promise.all([
+    searchAllCatalog({
       objectTypes: ["ITEM"],
       includeRelatedObjects: true,
       includeDeletedObjects: false,
     }),
-    square.catalog.search({
+    searchAllCatalog({
       objectTypes: ["CATEGORY"],
       includeDeletedObjects: false,
     }),
   ]);
 
-  const items = response.objects ?? [];
-  const related = response.relatedObjects ?? [];
+  const items = itemResult.objects;
+  const related = itemResult.related;
 
   // Index related objects by id for quick lookup. Store the narrowed variant
   // types so the type-specific `*Data` fields are accessible.
   const categoryNameById = new Map<string, string>();
   const imageUrlById = new Map<string, string>();
   const modifierListById = new Map<string, Square.CatalogModifierList>();
-  for (const obj of categoryResponse.objects ?? []) {
+  for (const obj of categoryResult.objects) {
     if (obj.type === "CATEGORY" && obj.id) {
       categoryNameById.set(obj.id, obj.categoryData?.name ?? "");
     }
@@ -116,6 +156,7 @@ export async function getMenu(): Promise<Menu> {
     if (obj.type !== "ITEM" || !obj.id || !obj.itemData) continue;
     const data = obj.itemData;
     if (data.isArchived) continue;
+    if (!isAtLocation(obj)) continue;
 
     // Variations (sizes / prices). Use a loop so the union narrows cleanly.
     const variations: MenuVariation[] = [];
@@ -188,7 +229,7 @@ export async function getMenu(): Promise<Menu> {
   }
 
   const categories = [...categoryBuckets.values()]
-    .filter((c) => c.items.length > 0)
+    .filter((c) => c.items.length > 0 && !HIDDEN_CATEGORIES.has(c.name.trim().toLowerCase()))
     .sort((a, b) => a.name.localeCompare(b.name));
 
   return { currency, categories };
