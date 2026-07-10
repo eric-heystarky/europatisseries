@@ -94,7 +94,7 @@ export default function Index() {
               {/* Logo removed as requested */}
             </div>
 
-            <p className="text-sm font-faro uppercase tracking-widest text-primary-foreground/80 mb-6">Les Collections</p>
+            <p className="text-2xl md:text-3xl font-shorelines text-primary-foreground/80 mb-4">Les Collections</p>
 
             <div className="flex flex-col space-y-4 md:space-y-6">
               {heroCategories.map((category, index) => (
@@ -102,7 +102,7 @@ export default function Index() {
                   key={category.name}
                   href={category.link}
                   onMouseEnter={() => setActiveHeroIndex(index)}
-                  className={`text-4xl md:text-6xl lg:text-7xl font-shorelines transition-colors duration-300 w-fit flex items-center ${
+                  className={`text-3xl md:text-5xl lg:text-6xl font-faro uppercase tracking-tight transition-colors duration-300 w-fit flex items-center ${
                     activeHeroIndex === index
                       ? "text-primary-foreground"
                       : "text-primary-foreground/50 hover:text-primary-foreground/80"
