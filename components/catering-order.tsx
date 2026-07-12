@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { Clock, DollarSign, Truck, ShoppingBag, ChevronDown } from "lucide-react";
 import type { Menu, MenuItem } from "@/lib/menu";
 import { formatPrice } from "@/lib/format";
 import { useCart } from "./cart-context";
@@ -21,8 +22,10 @@ import {
 function useAddItem() {
   const { addLine } = useCart();
   return (item: MenuItem, qty: number) => {
-    const variation =
-      item.variations.reduce((min, v) => (v.priceCents < min.priceCents ? v : min), item.variations[0]);
+    const variation = item.variations.reduce(
+      (min, v) => (v.priceCents < min.priceCents ? v : min),
+      item.variations[0],
+    );
     if (!variation) return;
     addLine(
       {
@@ -41,134 +44,68 @@ function useAddItem() {
 
 export function CateringOrder({ menu }: { menu: Menu }) {
   const byName = useMemo(() => indexMenuByName(menu), [menu]);
-  const addItem = useAddItem();
-  const { openDrawer } = useCart();
-
-  const addPack = (pack: PackDef) => {
-    const { lines, itemCount } = resolvePack(pack, byName);
-    if (lines.length === 0) {
-      toast.error("That pack is unavailable right now.");
-      return;
-    }
-    for (const l of lines) addItem(l.item, l.qty);
-    toast.success(`${pack.title} added — ${itemCount} items`);
-    openDrawer();
-  };
 
   return (
-    <div className="mx-auto max-w-6xl px-5 pb-40 pt-12">
-      {/* ───────── Guided event planner ───────── */}
-      <EventPlanner menu={menu} byName={byName} />
-
-      {/* ───────── Themed packs ───────── */}
-      <div className="mt-24 text-center">
-        <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
-          Or browse all packs
-        </p>
-        <h2 className="mt-1 font-shorelines text-5xl md:text-6xl">Catering Packs</h2>
-        <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">
-          Curated from our best-sellers. Add a pack, mix a few, or build your own
-          below — then unlock up to 11% off as your order grows.
-        </p>
+    <div className="mx-auto max-w-6xl px-5 pb-40">
+      {/* 1 — Guided planner (the primary path) */}
+      <div className="-mt-10">
+        <EventPlanner menu={menu} byName={byName} />
       </div>
 
-      <div className="mt-10 grid gap-6 sm:grid-cols-2">
-        {CATERING_PACKS.map((pack) => {
-          const { lines, totalCents, itemCount } = resolvePack(pack, byName);
-          const hero = lines.find((l) => l.item.imageUrl)?.item.imageUrl ?? null;
-          return (
-            <div
-              key={pack.id}
-              className="flex flex-col border-2 border-primary bg-card shadow-[4px_4px_0_0_hsl(var(--primary))]"
-            >
-              <div className="flex gap-4 p-5">
-                {hero && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={hero}
-                    alt=""
-                    className="h-24 w-24 flex-none border-2 border-primary object-cover"
-                  />
-                )}
-                <div className="min-w-0">
-                  <h3 className="font-serif text-xl font-bold uppercase tracking-wide">
-                    {pack.title}
-                  </h3>
-                  <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground">
-                    {pack.serves} · {itemCount} items
-                  </p>
-                  <p className="mt-2 text-sm text-muted-foreground">{pack.blurb}</p>
-                </div>
-              </div>
+      {/* 2 — How catering works (trust strip) */}
+      <HowItWorks currency={menu.currency} />
 
-              <ul className="flex-1 space-y-1 border-t-2 border-dashed border-primary/30 px-5 py-4 text-sm">
-                {lines.map((l) => (
-                  <li key={l.item.id} className="flex justify-between gap-2">
-                    <span className="text-foreground/80">
-                      {l.qty}× {l.item.name}
-                    </span>
-                    <span className="flex-none text-muted-foreground">
-                      {formatPrice(l.unitCents * l.qty, menu.currency)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+      {/* 3 — Ready-made packs */}
+      <PacksSection menu={menu} byName={byName} />
 
-              <div className="flex items-center justify-between border-t-2 border-primary p-5">
-                <p className="text-lg font-bold">{formatPrice(totalCents, menu.currency)}</p>
-                <button
-                  type="button"
-                  onClick={() => addPack(pack)}
-                  className="border-2 border-primary bg-primary px-5 py-2 text-sm font-bold uppercase tracking-widest text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_hsl(var(--primary))]"
-                >
-                  Add pack
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      {/* 4 — Build your own (secondary) */}
+      <BuildYourOwn menu={menu} />
+    </div>
+  );
+}
 
-      {/* ───────── Build your own pack ───────── */}
-      <CustomPackBuilder menu={menu} />
+/** Reassurance strip: minimum, lead time, fulfilment, free-delivery. */
+function HowItWorks({ currency }: { currency: string }) {
+  const items = [
+    { icon: DollarSign, title: `${formatPrice(10_000, currency)} minimum`, sub: "Per catering order" },
+    { icon: Clock, title: "24 hours notice", sub: "So the kitchen can prep" },
+    { icon: ShoppingBag, title: "Pickup or delivery", sub: "Your choice at checkout" },
+    { icon: Truck, title: "Free over $150", sub: "Delivery within our area" },
+  ];
+  return (
+    <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden border-2 border-primary bg-primary md:grid-cols-4">
+      {items.map(({ icon: Icon, title, sub }) => (
+        <div key={title} className="flex items-center gap-3 bg-card px-4 py-4">
+          <Icon className="h-6 w-6 flex-none" strokeWidth={1.5} />
+          <div className="min-w-0">
+            <p className="text-sm font-bold uppercase leading-tight tracking-wide">{title}</p>
+            <p className="text-xs text-muted-foreground">{sub}</p>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
 
 /**
- * Guided planner: the client enters a headcount and occasion, and we recommend
- * the right pack(s) and quantities — a suggested order they can add in one tap.
+ * Guided planner: headcount + occasion → a recommended spread framed around
+ * guests and per-head value, added in one tap.
  */
-function EventPlanner({
-  menu,
-  byName,
-}: {
-  menu: Menu;
-  byName: Map<string, MenuItem>;
-}) {
+function EventPlanner({ menu, byName }: { menu: Menu; byName: Map<string, MenuItem> }) {
   const addItem = useAddItem();
   const { openDrawer } = useCart();
-  const [guests, setGuests] = useState(20);
-  const [style, setStyle] = useState<EventStyleId>("mixed");
+  const [guests, setGuests] = useState(10);
+  const [style, setStyle] = useState<EventStyleId>("lunch");
 
   const g = Math.max(1, guests || 1);
   const recs = recommendPacks(g, style);
-
-  // Resolve each recommended pack against the live menu for pricing + contents.
-  const resolved = recs.map((r) => ({
-    ...r,
-    resolved: resolvePack(r.pack, byName),
-  }));
-  const totalCents = resolved.reduce(
-    (s, r) => s + r.resolved.totalCents * r.qty,
-    0,
-  );
-  const totalPieces = resolved.reduce(
-    (s, r) => s + r.resolved.itemCount * r.qty,
-    0,
-  );
-  const perPerson = totalPieces / g;
+  const resolved = recs.map((r) => ({ ...r, resolved: resolvePack(r.pack, byName) }));
+  const totalCents = resolved.reduce((s, r) => s + r.resolved.totalCents * r.qty, 0);
+  const totalPieces = resolved.reduce((s, r) => s + r.resolved.itemCount * r.qty, 0);
+  const servesTotal = resolved.reduce((s, r) => s + r.pack.servesCount * r.qty, 0);
   const status = cateringStatus(totalCents);
+  const money = (c: number) => formatPrice(c, menu.currency);
+  const perHead = money(Math.round(totalCents / g));
 
   const addSuggested = () => {
     let added = false;
@@ -184,28 +121,23 @@ function EventPlanner({
       toast.error("That suggestion is unavailable right now.");
       return;
     }
-    toast.success(`Suggested order added — ${totalPieces} pieces for ${g} guests`);
+    toast.success(`Added — enough for about ${g} guests`);
     openDrawer();
   };
 
-  const money = (c: number) => formatPrice(c, menu.currency);
-
   return (
     <div className="border-2 border-primary bg-primary text-primary-foreground shadow-[6px_6px_0_0_hsl(var(--primary))]">
-      <div className="p-6 text-center sm:p-8">
+      <div className="px-6 pt-7 text-center sm:px-8">
         <p className="text-xs uppercase tracking-[0.35em] text-primary-foreground/60">
-          Let us plan it for you
+          Start here
         </p>
-        <h2 className="mt-1 font-shorelines text-5xl md:text-6xl">
-          Planning an event?
-        </h2>
-        <p className="mx-auto mt-2 max-w-lg text-sm text-primary-foreground/75">
-          Tell us the numbers and the vibe — we&rsquo;ll suggest the perfect
-          spread, ready to add in one tap.
+        <h2 className="mt-1 font-shorelines text-5xl md:text-6xl">Plan my spread</h2>
+        <p className="mx-auto mt-2 max-w-md text-sm text-primary-foreground/75">
+          Two quick questions and we&rsquo;ll put together the perfect order.
         </p>
       </div>
 
-      <div className="grid gap-px bg-primary-foreground/20 md:grid-cols-[1fr_1fr]">
+      <div className="mt-6 grid gap-px bg-primary-foreground/20 md:grid-cols-2">
         {/* Step 1 — headcount */}
         <div className="bg-primary p-6 sm:p-8">
           <label className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/60">
@@ -272,9 +204,7 @@ function EventPlanner({
                 }`}
               >
                 <span className="text-xl leading-none">{s.emoji}</span>
-                <span className="mt-1.5 text-sm font-bold leading-tight">
-                  {s.label}
-                </span>
+                <span className="mt-1.5 text-sm font-bold leading-tight">{s.label}</span>
                 <span
                   className={`text-[11px] ${
                     style === s.id ? "text-primary/70" : "text-primary-foreground/60"
@@ -288,14 +218,14 @@ function EventPlanner({
         </div>
       </div>
 
-      {/* Suggested spread */}
+      {/* Recommendation */}
       <div className="border-t-2 border-primary-foreground/20 bg-primary-foreground p-6 text-primary sm:p-8">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h3 className="font-serif text-xl font-bold uppercase tracking-wide">
-            Your suggested spread
+          <h3 className="font-serif text-lg font-bold uppercase tracking-wide">
+            For {g} {g === 1 ? "guest" : "guests"}, we suggest
           </h3>
-          <p className="text-xs uppercase tracking-[0.15em] text-primary/60">
-            ~{perPerson.toFixed(1)} pieces / guest · {totalPieces} pieces total
+          <p className="text-xs font-bold uppercase tracking-[0.15em] text-primary/60">
+            Feeds ~{servesTotal} · {perHead}/guest
           </p>
         </div>
 
@@ -303,7 +233,7 @@ function EventPlanner({
           {resolved.map((r) => (
             <li
               key={r.pack.id}
-              className="flex items-center justify-between gap-3 border-2 border-primary/20 p-3"
+              className="flex items-center justify-between gap-3 border-2 border-primary/15 p-3"
             >
               <span className="font-semibold">
                 {r.qty}× {r.pack.title}
@@ -318,21 +248,22 @@ function EventPlanner({
           ))}
         </ul>
 
-        <div className="mt-4 flex flex-col gap-4 border-t-2 border-primary/20 pt-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-4 flex flex-col gap-4 border-t-2 border-primary/15 pt-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-2xl font-bold">
+            <p className="text-3xl font-bold">
               {money(totalCents)}
               {status.currentPct > 0 && (
                 <span className="ml-2 text-base font-medium text-primary/70">
-                  → {money(status.totalAfterDiscountCents)} with {status.currentPct}% off
+                  → {money(status.totalAfterDiscountCents)} after {status.currentPct}% off
                 </span>
               )}
             </p>
             <p className="text-xs uppercase tracking-[0.12em] text-primary/60">
+              {totalPieces} pieces ·{" "}
               {status.currentPct > 0
-                ? `Unlocks ${status.currentPct}% catering discount`
+                ? `${status.currentPct}% catering discount applied`
                 : status.nextTier
-                  ? `Add ${money(status.toNextCents)} to unlock ${status.nextTier.pct}% off`
+                  ? `Add ${money(status.toNextCents)} to save ${status.nextTier.pct}%`
                   : ""}
             </p>
           </div>
@@ -341,10 +272,130 @@ function EventPlanner({
             onClick={addSuggested}
             className="flex-none border-2 border-primary bg-primary px-6 py-3 text-sm font-bold uppercase tracking-widest text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[4px_4px_0_0_hsl(var(--primary))]"
           >
-            Add this order to cart
+            Add to cart →
           </button>
         </div>
+        <p className="mt-3 text-center text-xs text-primary/50 sm:text-left">
+          Not quite right? Adjust the numbers above, browse ready-made packs, or
+          build your own below.
+        </p>
       </div>
+    </div>
+  );
+}
+
+/** Ready-made packs — image-led cards with collapsible contents + per-head price. */
+function PacksSection({ menu, byName }: { menu: Menu; byName: Map<string, MenuItem> }) {
+  const addItem = useAddItem();
+  const { openDrawer } = useCart();
+
+  const addPack = (pack: PackDef) => {
+    const { lines, itemCount } = resolvePack(pack, byName);
+    if (lines.length === 0) {
+      toast.error("That pack is unavailable right now.");
+      return;
+    }
+    for (const l of lines) addItem(l.item, l.qty);
+    toast.success(`${pack.title} added — ${itemCount} pieces`);
+    openDrawer();
+  };
+
+  return (
+    <div className="mt-16">
+      <div className="text-center">
+        <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
+          Or pick a ready-made platter
+        </p>
+        <h2 className="mt-1 font-shorelines text-4xl md:text-5xl">Our Packs</h2>
+      </div>
+
+      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {CATERING_PACKS.map((pack) => {
+          const { lines, totalCents, itemCount } = resolvePack(pack, byName);
+          const hero = lines.find((l) => l.item.imageUrl)?.item.imageUrl ?? null;
+          const perHead = formatPrice(Math.round(totalCents / pack.servesCount), menu.currency);
+          return (
+            <div
+              key={pack.id}
+              className="flex flex-col border-2 border-primary bg-card shadow-[4px_4px_0_0_hsl(var(--primary))]"
+            >
+              {hero && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={hero}
+                  alt={pack.title}
+                  className="aspect-[4/3] w-full border-b-2 border-primary object-cover"
+                />
+              )}
+              <div className="flex flex-1 flex-col p-5">
+                <h3 className="font-serif text-xl font-bold uppercase tracking-wide">
+                  {pack.title}
+                </h3>
+                <p className="mt-0.5 text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
+                  {pack.serves} · ~{perHead}/guest
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">{pack.blurb}</p>
+
+                <details className="group mt-3">
+                  <summary className="flex cursor-pointer list-none items-center gap-1 text-xs font-bold uppercase tracking-widest text-primary [&::-webkit-details-marker]:hidden">
+                    See what&rsquo;s inside
+                    <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
+                  </summary>
+                  <ul className="mt-2 space-y-1 text-sm text-foreground/70">
+                    {lines.map((l) => (
+                      <li key={l.item.id}>
+                        {l.qty}× {l.item.name}
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+
+                <div className="mt-auto flex items-end justify-between pt-4">
+                  <div>
+                    <p className="text-lg font-bold">{formatPrice(totalCents, menu.currency)}</p>
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                      {itemCount} pieces
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => addPack(pack)}
+                    className="border-2 border-primary bg-primary px-5 py-2 text-sm font-bold uppercase tracking-widest text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_hsl(var(--primary))]"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/** Collapsible wrapper around the item-by-item builder (secondary path). */
+function BuildYourOwn({ menu }: { menu: Menu }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mt-16">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-4 border-2 border-primary bg-card p-5 text-left shadow-[4px_4px_0_0_hsl(var(--primary))]"
+      >
+        <span>
+          <span className="font-shorelines text-3xl md:text-4xl">Build your own pack</span>
+          <span className="mt-0.5 block text-sm text-muted-foreground">
+            Prefer full control? Pick any mix of items — it all counts toward your discount.
+          </span>
+        </span>
+        <ChevronDown
+          className={`h-7 w-7 flex-none transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      {open && <CustomPackBuilder menu={menu} />}
     </div>
   );
 }
@@ -385,10 +436,7 @@ function CustomPackBuilder({ menu }: { menu: Menu }) {
   const totalItems = selected.reduce((s, [, n]) => s + n, 0);
 
   const bump = (id: string, delta: number) =>
-    setQty((q) => {
-      const next = Math.max(0, (q[id] ?? 0) + delta);
-      return { ...q, [id]: next };
-    });
+    setQty((q) => ({ ...q, [id]: Math.max(0, (q[id] ?? 0) + delta) }));
 
   const addCustom = () => {
     if (selected.length === 0) return;
@@ -396,7 +444,7 @@ function CustomPackBuilder({ menu }: { menu: Menu }) {
       const it = itemById.get(id);
       if (it) addItem(it, n);
     }
-    toast.success(`Your pack added — ${totalItems} items`);
+    toast.success(`Your pack added — ${totalItems} pieces`);
     setQty({});
     openDrawer();
   };
@@ -404,17 +452,7 @@ function CustomPackBuilder({ menu }: { menu: Menu }) {
   const cat = foodCats.find((c) => c.id === activeCat) ?? foodCats[0];
 
   return (
-    <div className="mt-20 border-2 border-primary bg-card shadow-[4px_4px_0_0_hsl(var(--primary))]">
-      <div className="border-b-2 border-primary p-6 text-center">
-        <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
-          Your call
-        </p>
-        <h3 className="mt-1 font-shorelines text-4xl md:text-5xl">Build Your Own Pack</h3>
-        <p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground">
-          Pick any mix of items and quantities. It all counts toward your discount.
-        </p>
-      </div>
-
+    <div className="border-x-2 border-b-2 border-primary bg-card">
       {/* Category tabs */}
       <div className="flex flex-wrap gap-2 border-b-2 border-primary/20 p-4">
         {foodCats.map((c) => (

@@ -193,6 +193,16 @@ export function recommendPacks(guests: number, style: EventStyleId): Recommendat
   const g = Math.max(1, Math.round(guests));
 
   if (style === "mixed") {
+    // Small mixed groups: pair a savoury + a sweet pack for variety without
+    // over-serving a 25-person grazing table.
+    if (g < 18) {
+      const savoury = CATERING_PACKS.find((p) => p.id === "savoury-lunch")!;
+      const sweet = CATERING_PACKS.find((p) => p.id === "sweet-morning-tea")!;
+      return [
+        { pack: savoury, qty: Math.max(1, Math.round(g / savoury.servesCount)) },
+        { pack: sweet, qty: Math.max(1, Math.round(g / sweet.servesCount)) },
+      ];
+    }
     // Fill with Celebration Feasts (50), then a Grand Grazing (25) for a large
     // remainder — otherwise a single Grand Grazing scaled to the group.
     const feast = CATERING_PACKS.find((p) => p.id === "celebration-feast")!;

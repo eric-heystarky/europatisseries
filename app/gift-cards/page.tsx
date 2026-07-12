@@ -1,21 +1,35 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Gift, Store, Mail } from "lucide-react";
+import { Gift, Mail, CreditCard } from "lucide-react";
 import { AnimatedSection } from "@/components/AnimatedSection";
 
 export const metadata: Metadata = {
   title: "Gift Cards",
   description:
-    "Give the gift of fresh European pastry. Euro Patisserie Armadale gift cards in any amount — redeemable in-store on pastries, cakes, coffee & catering.",
+    "Give the gift of fresh European pastry. Buy a Euro Patisserie Armadale eGift card online in any amount — emailed instantly and redeemable in-store on pastries, cakes, coffee & catering.",
   alternates: { canonical: "/gift-cards" },
 };
+
+/** Square-hosted eGift purchase flow (handles payment, card creation & emailing). */
+const GIFT_CARD_URL = "https://app.squareup.com/gift/ML6J1PF8K4AKW/order";
 
 const AMOUNTS = ["$25", "$50", "$100", "Custom"];
 
 const STEPS = [
-  { icon: Mail, title: "Choose an amount", body: "Pick a value (or any custom amount) and let us know who it's for." },
-  { icon: Store, title: "We prepare it", body: "Collect a beautifully presented card in-store, or we'll email a digital one." },
-  { icon: Gift, title: "They treat themselves", body: "Redeemable in-store on everything — pastries, cakes, coffee and catering." },
+  {
+    icon: CreditCard,
+    title: "Choose & pay",
+    body: "Pick a value (or any custom amount) and pay securely — checkout is powered by Square.",
+  },
+  {
+    icon: Mail,
+    title: "Sent by email",
+    body: "The card is emailed to your recipient instantly, or schedule it to arrive on the perfect day.",
+  },
+  {
+    icon: Gift,
+    title: "They treat themselves",
+    body: "Redeemable in-store on everything — pastries, cakes, coffee and catering.",
+  },
 ];
 
 export default function GiftCardsPage() {
@@ -37,7 +51,7 @@ export default function GiftCardsPage() {
           <div className="relative aspect-[16/10] w-full border-2 border-primary bg-primary p-7 text-primary-foreground shadow-[10px_10px_0_0_hsl(var(--primary))]">
             <div className="flex h-full flex-col justify-between">
               <div className="flex items-start justify-between">
-                <span className="text-sm font-bold uppercase tracking-[0.25em]">Gift Card</span>
+                <span className="text-sm font-bold uppercase tracking-[0.25em]">eGift Card</span>
                 <Gift className="h-7 w-7" strokeWidth={1.25} />
               </div>
               <div>
@@ -53,24 +67,35 @@ export default function GiftCardsPage() {
             Any occasion, any amount
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            Birthdays, thank-yous, or just because — a Euro Patisserie gift card never disappoints. Choose a value
-            below and we&apos;ll sort the rest.
+            Birthdays, thank-yous, or just because — a Euro Patisserie eGift card never disappoints. Buy online
+            in seconds and it&apos;s emailed straight to your recipient.
           </p>
+
+          {/* Amount tiles double as quick "buy" entry points */}
           <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {AMOUNTS.map((a) => (
-              <div
+              <a
                 key={a}
-                className="flex items-center justify-center border-2 border-primary bg-card py-4 text-lg font-bold tabular-nums"
+                href={GIFT_CARD_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center border-2 border-primary bg-card py-4 text-lg font-bold tabular-nums transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary hover:text-primary-foreground hover:shadow-[3px_3px_0_0_hsl(var(--primary))]"
               >
                 {a}
-              </div>
+              </a>
             ))}
           </div>
-          <Link href="/contact" className="btn-brutal mt-7 w-full py-3.5 text-sm">
-            Enquire / Order a Gift Card
-          </Link>
+
+          <a
+            href={GIFT_CARD_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-brutal mt-7 flex w-full items-center justify-center gap-2 py-3.5 text-sm"
+          >
+            Buy a gift card →
+          </a>
           <p className="mt-3 text-xs text-muted-foreground">
-            Also available to purchase in-store at 974 High St, Armadale.
+            Secure checkout powered by Square. Also available to purchase in-store at 974 High St, Armadale.
           </p>
         </AnimatedSection>
       </section>
