@@ -5,8 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
 import { AnimatedSection } from "@/components/AnimatedSection";
+import type { Menu } from "@/lib/menu";
+import { CateringOrder } from "@/components/catering-order";
+import { DiscountProgressBar } from "@/components/discount-progress-bar";
 
-export default function Catering() {
+export default function Catering({ menu }: { menu: Menu }) {
   return (
     <div className="flex flex-col w-full bg-background min-h-screen">
       {/* Hero */}
@@ -20,6 +23,9 @@ export default function Catering() {
           </p>
         </div>
       </AnimatedSection>
+
+      {/* Order catering packs (best-seller platters + build-your-own) */}
+      <CateringOrder menu={menu} />
 
       {/* Content */}
       <section className="py-24 px-4 md:px-8 overflow-hidden">
@@ -65,6 +71,9 @@ export default function Catering() {
           </div>
         </AnimatedSection>
       </section>
+
+      {/* Sticky discount-progress nudge (catering only) */}
+      <DiscountProgressBar currency={menu.currency} />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { useCart, lineUnitPrice, type CartLine } from "./cart-context";
 import { formatPrice } from "@/lib/format";
+import { cateringStatus } from "@/lib/catering";
 import { CardForm, type CardFormHandle } from "./card-form";
 import { AddressAutocomplete } from "./address-autocomplete";
 import { WalletButtons } from "./wallet-buttons";
@@ -56,7 +57,11 @@ export function Checkout({ currency }: { currency: string }) {
     setAddr((prev) => ({ ...prev, [field]: value, coords: undefined }));
 
   const deliveryFeeCents = fulfillmentType === "DELIVERY" && quote ? quote.feeCents : 0;
-  const estimatedTotalCents = subtotalCents + deliveryFeeCents;
+  // Catering volume discount — matches the server-authoritative tier applied at
+  // order creation. Shown here so the total on-screen equals the amount charged.
+  const catering = cateringStatus(subtotalCents);
+  const discountCents = catering.discountCents;
+  const estimatedTotalCents = subtotalCents - discountCents + deliveryFeeCents;
 
   async function getQuote() {
     setError(null);
@@ -107,6 +112,12 @@ export function Checkout({ currency }: { currency: string }) {
             <div className="flex justify-between">
               <dt className="uppercase tracking-[0.12em] text-muted-foreground">Delivery</dt>
               <dd className="tabular-nums">{formatPrice(result.deliveryFeeCents, result.currency)}</dd>
+            </div>
+          )}
+          {result.discountCents > 0 && (
+            <div className="flex justify-between text-primary">
+              <dt className="uppercase tracking-[0.12em]">Catering discount</dt>
+              <dd className="tabular-nums">−{formatPrice(result.discountCents, result.currency)}</dd>
             </div>
           )}
           <div className="flex justify-between font-bold">
@@ -236,6 +247,8 @@ export function Checkout({ currency }: { currency: string }) {
           lines={lines}
           currency={currency}
           subtotalCents={subtotalCents}
+          discountCents={discountCents}
+          discountPct={catering.currentPct}
           deliveryQuote={fulfillmentType === "DELIVERY" ? quote : null}
           estimatedTotalCents={estimatedTotalCents}
         />
@@ -304,7 +317,7 @@ export function Checkout({ currency }: { currency: string }) {
             {quote ? (
               <div className="border-2 border-border bg-card px-3 py-2 text-sm">
                 {quote.waived ? (
-                  <p className="font-bold uppercase tracking-[0.1em]">Free delivery — order over $300 🎉</p>
+                  <p className="font-bold uppercase tracking-[0.1em]">Free delivery — order over $150 🎉</p>
                 ) : (
                   <p>
                     Delivery: <span className="font-bold">{quote.billedKm} km</span> ·{" "}
@@ -367,12 +380,16 @@ function OrderSummary({
   lines,
   currency,
   subtotalCents,
+  discountCents,
+  discountPct,
   deliveryQuote,
   estimatedTotalCents,
 }: {
   lines: CartLine[];
   currency: string;
   subtotalCents: number;
+  discountCents: number;
+  discountPct: number;
   deliveryQuote: Quote | null;
   estimatedTotalCents: number;
 }) {
@@ -446,10 +463,16 @@ function OrderSummary({
           <span>Subtotal</span>
           <span className="tabular-nums">{formatPrice(subtotalCents, currency)}</span>
         </div>
+        {discountCents > 0 && (
+          <div className="flex justify-between font-semibold text-primary">
+            <span>Catering discount ({discountPct}% off)</span>
+            <span className="tabular-nums">−{formatPrice(discountCents, currency)}</span>
+          </div>
+        )}
         {deliveryQuote && (
           <div className="flex justify-between text-muted-foreground">
             <span>
-              Delivery{deliveryQuote.waived ? " (free over $300)" : ` (${deliveryQuote.billedKm} km)`}
+              Delivery{deliveryQuote.waived ? " (free over $150)" : ` (${deliveryQuote.billedKm} km)`}
             </span>
             <span className="tabular-nums">
               {deliveryQuote.feeCents === 0 ? "Free" : formatPrice(deliveryQuote.feeCents, currency)}

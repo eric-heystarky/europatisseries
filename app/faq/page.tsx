@@ -20,7 +20,7 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
   },
   {
     q: "How much is delivery, and how far do you go?",
-    a: "Delivery is $5 per km driving distance from our Armadale shop, calculated live at checkout when you enter your address. Free delivery on orders over $300.",
+    a: "Delivery is $5 per km driving distance from our Armadale shop, calculated live at checkout when you enter your address. Free delivery on orders over $150.",
   },
   {
     q: "Can you cater for events?",

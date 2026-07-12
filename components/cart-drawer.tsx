@@ -11,8 +11,8 @@ const HIDDEN_VARIATIONS = ["Each", "Slice", "Regular"];
 export function CartDrawer({ currency = "AUD" }: { currency?: string }) {
   const { lines, count, subtotalCents, setQty, remove, clear, drawerOpen, closeDrawer } = useCart();
 
-  // Free delivery on orders over $300 — nudge the customer toward it.
-  const FREE_DELIVERY_CENTS = 30_000;
+  // Free delivery on orders over $150 — nudge the customer toward it.
+  const FREE_DELIVERY_CENTS = 15_000;
   const freeRemaining = Math.max(0, FREE_DELIVERY_CENTS - subtotalCents);
   const freePct = Math.min(100, Math.round((subtotalCents / FREE_DELIVERY_CENTS) * 100));
 

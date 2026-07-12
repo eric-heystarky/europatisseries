@@ -7,6 +7,7 @@ import {
   FREE_DELIVERY_THRESHOLD_CENTS,
   type DeliveryAddress,
 } from "@/lib/delivery";
+import { cateringStatus } from "@/lib/catering";
 import type { Square } from "square";
 import type { CartLine } from "@/components/cart-context";
 
@@ -33,6 +34,8 @@ export type CheckoutResult =
       orderId: string;
       totalCents: number;
       deliveryFeeCents: number;
+      /** Catering volume discount applied to the order, in cents (0 if none). */
+      discountCents: number;
       currency: string;
       status: string;
     }
@@ -71,7 +74,7 @@ export type DeliveryQuoteResult =
 
 /**
  * Live delivery quote for the checkout UI: geocodes the address, measures the
- * driving distance, and applies the free-over-$300 waiver.
+ * driving distance, and applies the free-over-$150 waiver.
  */
 export async function quoteDelivery(
   address: DeliveryAddress,
@@ -105,6 +108,23 @@ export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> 
 
     const lineItems = buildLineItems(input.lines);
 
+    // Authoritative items total (taxed) → catering volume-discount tier. Computed
+    // once here and reused for the delivery-waiver check below.
+    const itemsInfo = await taxedItemsTotalCents(input.lines);
+    const discountPct = cateringStatus(itemsInfo.cents).currentPct;
+    const discounts: Square.OrderLineItemDiscount[] | undefined =
+      discountPct > 0
+        ? [
+            {
+              uid: "catering-volume-discount",
+              name: `Catering volume discount (${discountPct}%)`,
+              type: "FIXED_PERCENTAGE",
+              percentage: String(discountPct),
+              scope: "ORDER",
+            },
+          ]
+        : undefined;
+
     const recipient: Square.FulfillmentRecipient = {
       displayName: input.customer.name,
       phoneNumber: input.customer.phone,
@@ -125,15 +145,14 @@ export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> 
 
       // Authoritative delivery fee — recomputed server-side, never trusted from the client.
       const quote = await getDeliveryQuote(input.address);
-      const items = await taxedItemsTotalCents(input.lines);
-      const waived = items.cents >= FREE_DELIVERY_THRESHOLD_CENTS;
+      const waived = itemsInfo.cents >= FREE_DELIVERY_THRESHOLD_CENTS;
       const feeCents = waived ? 0 : quote.feeCents;
 
       if (feeCents > 0) {
         serviceCharges = [
           {
             name: `Delivery (${quote.billedKm} km)`,
-            amountMoney: { amount: BigInt(feeCents), currency: items.currency as Square.Currency },
+            amountMoney: { amount: BigInt(feeCents), currency: itemsInfo.currency as Square.Currency },
             calculationPhase: "TOTAL_PHASE",
           },
         ];
@@ -178,6 +197,7 @@ export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> 
         lineItems,
         fulfillments: [fulfillment],
         serviceCharges,
+        discounts,
       },
     });
 
@@ -204,6 +224,7 @@ export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> 
       deliveryFeeCents: deliveryFee != null ? Number(deliveryFee) : 0,
       currency: order.totalMoney.currency ?? "AUD",
       status: payRes.payment?.status ?? "UNKNOWN",
+      discountCents: order.totalDiscountMoney?.amount != null ? Number(order.totalDiscountMoney.amount) : 0,
     };
   } catch (err) {
     const message = extractSquareError(err);

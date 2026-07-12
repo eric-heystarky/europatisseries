@@ -30,7 +30,7 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
     a: (
       <>
         Delivery is <strong>$5 per km</strong> driving distance from our Armadale shop, calculated live at
-        checkout when you enter your address. <strong>Free delivery on orders over $300.</strong> Enter your
+        checkout when you enter your address. <strong>Free delivery on orders over $150.</strong> Enter your
         address for an instant quote.
       </>
     ),

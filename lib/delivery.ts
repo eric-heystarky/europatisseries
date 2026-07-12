@@ -5,7 +5,7 @@ import "server-only";
  *  - Origin: the shop (Armadale). The customer address is geocoded/routed and a
  *    driving distance is measured from the shop.
  *  - Fee: $5 per km, rounded UP to the whole km.
- *  - Free delivery once the taxed order total (excluding delivery) reaches $300
+ *  - Free delivery once the taxed order total (excluding delivery) reaches $150
  *    — that waiver is applied by the checkout action, not here.
  *
  * Primary provider: Google Maps **Routes API** (uses GOOGLE_MAPS_SERVER_KEY).
@@ -22,7 +22,7 @@ export const SHOP_ORIGIN = {
 };
 
 export const PER_KM_CENTS = 500; // $5 per km
-export const FREE_DELIVERY_THRESHOLD_CENTS = 30_000; // $300 taxed total
+export const FREE_DELIVERY_THRESHOLD_CENTS = 15_000; // $150 taxed total
 
 // A descriptive User-Agent is required by the Nominatim usage policy (fallback).
 const UA = "square-menu-site/1.0 (hello@heystarky.com.au)";
