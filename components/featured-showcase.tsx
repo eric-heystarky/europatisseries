@@ -1,10 +1,14 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { useRef } from "react";
 
 /**
- * Curated "featured creations" row — a few signature items with real food
- * photography (overhead by default, close-up on hover). Replaces the marquee.
- * Photos live in /public/images/featured and are generated/editorial shots.
+ * Curated "featured creations" row — signature items with real food photography
+ * (default shot, warmer variation on hover). The row is drag-to-scroll on
+ * desktop (click and drag) and swipe on touch. Photos live in
+ * /public/images/featured.
  */
 type Feature = {
   name: string;
@@ -14,14 +18,42 @@ type Feature = {
 };
 
 const FEATURES: Feature[] = [
-  { name: "Tarte au Citron", price: "$9.50", over: "/images/featured/tarte-au-citron-over.jpg", close: "/images/featured/tarte-au-citron-close.jpg" },
-  { name: "Mille-Feuille", price: "$11.00", over: "/images/featured/mille-feuille-over.jpg", close: "/images/featured/mille-feuille-close.jpg" },
-  { name: "L'Opéra", price: "$12.00", over: "/images/featured/lopera-over.jpg", close: "/images/featured/lopera-close.jpg" },
-  { name: "Croissant au Beurre", price: "from $6.50", over: "/images/featured/croissant-over.jpg", close: "/images/featured/croissant-close.jpg" },
-  { name: "Éclair", price: "$7.50", over: "/images/featured/eclair-over.jpg", close: "/images/featured/eclair-close.jpg" },
+  { name: "Croissant au Beurre", price: "$7.20", over: "/images/featured/croissant-hero.jpg", close: "/images/featured/croissant-hover.jpg" },
+  { name: "Éclair", price: "$10.30", over: "/images/featured/eclair-hero.jpg", close: "/images/featured/eclair-hover.jpg" },
+  { name: "Steak Pie", price: "$10.40", over: "/images/featured/steak-pie.jpg", close: "/images/featured/steak-pie-hover.jpg" },
+  { name: "Nutella Scroll", price: "$9.40", over: "/images/featured/nutella-scroll.jpg", close: "/images/featured/nutella-scroll-hover.jpg" },
+  { name: "Chicken & Dill Wrap", price: "$10.90", over: "/images/featured/chicken-wrap.jpg", close: "/images/featured/chicken-wrap-hover.jpg" },
 ];
 
 export function FeaturedShowcase() {
+  const rowRef = useRef<HTMLUListElement>(null);
+  // Drag-to-scroll state. `moved` suppresses the card's click after a drag so a
+  // drag doesn't accidentally navigate.
+  const drag = useRef({ down: false, startX: 0, scrollLeft: 0, moved: false });
+
+  const onDown = (e: React.MouseEvent) => {
+    const el = rowRef.current;
+    if (!el) return;
+    drag.current = { down: true, startX: e.pageX, scrollLeft: el.scrollLeft, moved: false };
+  };
+  const onMove = (e: React.MouseEvent) => {
+    const el = rowRef.current;
+    if (!el || !drag.current.down) return;
+    const dx = e.pageX - drag.current.startX;
+    if (Math.abs(dx) > 4) drag.current.moved = true;
+    el.scrollLeft = drag.current.scrollLeft - dx;
+  };
+  const onUp = () => {
+    drag.current.down = false;
+  };
+  const onClickCapture = (e: React.MouseEvent) => {
+    if (drag.current.moved) {
+      e.preventDefault();
+      e.stopPropagation();
+      drag.current.moved = false;
+    }
+  };
+
   return (
     <section className="border-b-2 border-primary bg-background px-5 py-16 md:px-8 md:py-20">
       <div className="mx-auto max-w-7xl">
@@ -44,11 +76,19 @@ export function FeaturedShowcase() {
           </Link>
         </div>
 
-        {/* Scrollable card row */}
-        <ul className="-mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-2 md:mx-0 md:gap-6 md:px-0">
+        {/* Drag-to-scroll card row (swipe on touch) */}
+        <ul
+          ref={rowRef}
+          onMouseDown={onDown}
+          onMouseMove={onMove}
+          onMouseUp={onUp}
+          onMouseLeave={onUp}
+          onClickCapture={onClickCapture}
+          className="-mx-5 flex cursor-grab select-none gap-5 overflow-x-auto px-5 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] active:cursor-grabbing md:mx-0 md:gap-6 md:px-0 [&::-webkit-scrollbar]:hidden"
+        >
           {FEATURES.map((f) => (
-            <li key={f.name} className="w-[72%] flex-none snap-start sm:w-[44%] lg:w-[calc((100%-4*1.5rem)/5)]">
-              <Link href="/pre-order" className="group block">
+            <li key={f.name} className="w-[72%] flex-none sm:w-[44%] lg:w-[calc((100%-4*1.5rem)/5)]">
+              <Link href="/pre-order" className="group block" draggable={false}>
                 <div className="relative aspect-[3/4] w-full overflow-hidden border-2 border-primary bg-card">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -56,6 +96,7 @@ export function FeaturedShowcase() {
                     alt={f.name}
                     loading="lazy"
                     decoding="async"
+                    draggable={false}
                     className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 group-hover:opacity-0"
                   />
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -65,6 +106,7 @@ export function FeaturedShowcase() {
                     aria-hidden
                     loading="lazy"
                     decoding="async"
+                    draggable={false}
                     className="absolute inset-0 h-full w-full scale-105 object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                   />
                 </div>

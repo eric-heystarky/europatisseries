@@ -9,6 +9,18 @@ import { useRef, useState } from "react";
 import { AnimatedSection } from "@/components/AnimatedSection";
 import { FeaturedShowcase } from "@/components/featured-showcase";
 import { WhyEuro } from "@/components/why-euro";
+import { RotatingCollage } from "@/components/rotating-collage";
+
+type Tile = {
+  title: string;
+  link: string;
+  image: string;
+  hover?: string;
+  /** When set, the tile cross-fades through these photos instead of hover-swapping. */
+  rotate?: string[];
+  span?: string;
+  aspect?: string;
+};
 
 const heroCategories = [
   { name: "Artisan Cakes", image: "/images/hero/artisan-cakes.jpg", link: "/pre-order" },
@@ -18,21 +30,22 @@ const heroCategories = [
   { name: "Grab & Go", image: "/images/hero/grab-go.jpg", link: "/pre-order" },
 ];
 
-const mobileTiles = [
-  { title: "WEDDING CAKES", link: "/pre-order", image: "/images/catering/piece-montee.jpg" },
-  { title: "LARGE ENTREMETS", link: "/catering", image: "/images/catering/grand-entremets.jpg" },
-  { title: "SWEET COCKTAIL PIECES", link: "/contact", image: "/images/catering/cocktails-sucrees.jpg" },
-  { title: "SAVORY COCKTAIL PIECES", link: "/pre-order", image: "/images/catering/cocktails-salees.jpg" },
+const PIE_ROTATION = ["/images/catering/gourmet-pie.jpg", "/images/catering/pie-steak.jpg"];
+
+const mobileTiles: Tile[] = [
+  { title: "CROISSANTS", link: "/pre-order", image: "/images/catering/croissant-flatlay.jpg", hover: "/images/catering/croissant-flatlay-hover.jpg" },
+  { title: "ALMOND CROISSANT", link: "/pre-order", image: "/images/catering/almond-croissant.jpg", hover: "/images/catering/almond-croissant-section.jpg" },
+  { title: "TARTE AU CITRON", link: "/pre-order", image: "/images/catering/lemon-tart.jpg", hover: "/images/catering/lemon-tart-hover.jpg" },
+  { title: "GOURMET PIES", link: "/pre-order", image: "/images/catering/gourmet-pie.jpg", rotate: PIE_ROTATION },
+  { title: "CINNAMON SCROLL", link: "/pre-order", image: "/images/catering/cinnamon-scroll.jpg", hover: "/images/catering/cinnamon-scroll-hover.jpg" },
 ];
 
-const desktopTiles = [
-  { title: "PIÈCE MONTÉE", link: "/pre-order", span: "col-span-2", aspect: "aspect-[4/3]", image: "/images/catering/piece-montee.jpg" },
-  { title: "GRAND ENTREMETS", link: "/catering", span: "col-span-1", aspect: "aspect-[3/4]", image: "/images/catering/grand-entremets.jpg" },
-  { title: "PIÈCES COCKTAILS SUCRÉES", link: "/contact", span: "col-span-1", aspect: "aspect-[3/4]", image: "/images/catering/cocktails-sucrees.jpg" },
-  { title: "PIÈCES COCKTAILS SALÉES", link: "/pre-order", span: "col-span-2", aspect: "aspect-[4/3]", image: "/images/catering/cocktails-salees.jpg" },
-  { title: "ECLAIRS", link: "/pre-order", span: "col-span-1", aspect: "aspect-[3/4]", image: "/images/featured/eclair-over.jpg" },
-  { title: "GRAB & GO", link: "/pre-order", span: "col-span-1", aspect: "aspect-[3/4]", image: "/images/catering/grab-and-go.jpg" },
-  { title: "BUFFET", link: "/catering", span: "col-span-2", aspect: "aspect-[4/3]", image: "/images/catering/buffet.jpg" },
+const desktopTiles: Tile[] = [
+  { title: "CROISSANTS", link: "/pre-order", span: "col-span-2", aspect: "aspect-[4/3]", image: "/images/catering/croissant-flatlay.jpg", hover: "/images/catering/croissant-flatlay-hover.jpg" },
+  { title: "ALMOND CROISSANT", link: "/pre-order", span: "col-span-1", aspect: "aspect-[3/4]", image: "/images/catering/almond-croissant.jpg", hover: "/images/catering/almond-croissant-section.jpg" },
+  { title: "TARTE AU CITRON", link: "/pre-order", span: "col-span-1", aspect: "aspect-[3/4]", image: "/images/catering/lemon-tart.jpg", hover: "/images/catering/lemon-tart-hover.jpg" },
+  { title: "GOURMET PIES", link: "/pre-order", span: "col-span-1", aspect: "aspect-[3/4]", image: "/images/catering/gourmet-pie.jpg", rotate: PIE_ROTATION },
+  { title: "CINNAMON SCROLL", link: "/pre-order", span: "col-span-1", aspect: "aspect-[3/4]", image: "/images/catering/cinnamon-scroll.jpg", hover: "/images/catering/cinnamon-scroll-hover.jpg" },
 ];
 
 export default function Index() {
@@ -154,8 +167,16 @@ export default function Index() {
                   {mobileTiles.map((item, i) => (
                     <CarouselItem key={i} className="pl-4 basis-[85%] sm:basis-[70%]">
                       <Link href={item.link} className="group block relative h-[60vh] border-2 border-primary bg-card overflow-hidden">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={item.image} alt={item.title} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                        {item.rotate ? (
+                          <RotatingCollage images={item.rotate} alt={item.title} intervalMs={1000} />
+                        ) : (
+                          <>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={item.image} alt={item.title} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 group-hover:opacity-0" />
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={item.hover} alt="" aria-hidden loading="lazy" decoding="async" className="absolute inset-0 h-full w-full scale-105 object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                          </>
+                        )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                         <div className="absolute bottom-0 left-0 w-full p-6 text-center">
                           <h3 className="font-faro text-white text-sm uppercase tracking-widest">{item.title}</h3>
@@ -170,12 +191,20 @@ export default function Index() {
             {/* Desktop Grid/List View */}
             <div className="hidden md:grid grid-cols-2">
               {desktopTiles.map((item, i) => {
-                const isLeftColumnSmall = item.span === 'col-span-1' && (i === 1 || i === 4);
+                const isLeftColumnSmall = item.span === 'col-span-1' && i % 2 === 1;
                 return (
                   <Link key={i} href={item.link} className={`group block relative border-b-2 border-primary ${isLeftColumnSmall ? 'border-r-2' : ''} ${item.span} overflow-hidden`}>
                     <div className={item.aspect}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={item.image} alt={item.title} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                      {item.rotate ? (
+                        <RotatingCollage images={item.rotate} alt={item.title} intervalMs={1000} />
+                      ) : (
+                        <>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={item.image} alt={item.title} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 group-hover:opacity-0" />
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={item.hover} alt="" aria-hidden loading="lazy" decoding="async" className="absolute inset-0 h-full w-full scale-105 object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                        </>
+                      )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                       <div className="absolute bottom-0 left-0 w-full p-6 text-center">
                         <h3 className="font-faro text-white text-xs md:text-sm font-bold uppercase tracking-widest">{item.title}</h3>

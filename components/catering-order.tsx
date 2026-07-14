@@ -309,61 +309,92 @@ function PacksSection({ menu, byName }: { menu: Menu; byName: Map<string, MenuIt
         <h2 className="mt-1 font-shorelines text-4xl md:text-5xl">Our Packs</h2>
       </div>
 
-      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
         {CATERING_PACKS.map((pack) => {
           const { lines, totalCents, itemCount } = resolvePack(pack, byName);
           const hero = lines.find((l) => l.item.imageUrl)?.item.imageUrl ?? null;
           const perHead = formatPrice(Math.round(totalCents / pack.servesCount), menu.currency);
           return (
-            <div
-              key={pack.id}
-              className="flex flex-col border-2 border-primary bg-card shadow-[4px_4px_0_0_hsl(var(--primary))]"
-            >
-              {hero && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={hero}
-                  alt={pack.title}
-                  className="aspect-[4/3] w-full border-b-2 border-primary object-cover"
-                />
-              )}
-              <div className="flex flex-1 flex-col p-5">
-                <h3 className="font-serif text-xl font-bold uppercase tracking-wide">
+            <div key={pack.id} className="flex">
+              {/* Mobile: image-first tile with the label + price on the photo */}
+              <div className="relative aspect-[4/5] w-full overflow-hidden border-2 border-primary shadow-[4px_4px_0_0_hsl(var(--primary))] sm:hidden">
+                {hero ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={hero} alt={pack.title} className="absolute inset-0 h-full w-full object-cover" />
+                ) : (
+                  <div className="absolute inset-0 bg-primary" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-black/85" />
+                <h3 className="absolute inset-x-3 top-3 font-serif text-base font-bold uppercase leading-tight tracking-wide text-white [text-shadow:0_1px_6px_rgba(0,0,0,0.55)]">
                   {pack.title}
                 </h3>
-                <p className="mt-0.5 text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
-                  {pack.serves} · ~{perHead}/guest
-                </p>
-                <p className="mt-2 text-sm text-muted-foreground">{pack.blurb}</p>
-
-                <details className="group mt-3">
-                  <summary className="flex cursor-pointer list-none items-center gap-1 text-xs font-bold uppercase tracking-widest text-primary [&::-webkit-details-marker]:hidden">
-                    See what&rsquo;s inside
-                    <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
-                  </summary>
-                  <ul className="mt-2 space-y-1 text-sm text-foreground/70">
-                    {lines.map((l) => (
-                      <li key={l.item.id}>
-                        {l.qty}× {l.item.name}
-                      </li>
-                    ))}
-                  </ul>
-                </details>
-
-                <div className="mt-auto flex items-end justify-between pt-4">
-                  <div>
-                    <p className="text-lg font-bold">{formatPrice(totalCents, menu.currency)}</p>
-                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                      {itemCount} pieces
-                    </p>
+                <div className="absolute inset-x-3 bottom-3 text-white">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-white/85">
+                    {pack.serves} · ~{perHead}/guest
+                  </p>
+                  <div className="mt-1.5 flex items-center justify-between gap-2">
+                    <span className="text-lg font-bold [text-shadow:0_1px_6px_rgba(0,0,0,0.55)]">
+                      {formatPrice(totalCents, menu.currency)}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => addPack(pack)}
+                      className="border-2 border-white bg-white px-3 py-1 text-xs font-bold uppercase tracking-widest text-primary active:scale-95"
+                    >
+                      Add
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => addPack(pack)}
-                    className="border-2 border-primary bg-primary px-5 py-2 text-sm font-bold uppercase tracking-widest text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_hsl(var(--primary))]"
-                  >
-                    Add
-                  </button>
+                </div>
+              </div>
+
+              {/* Tablet / desktop: full detailed card */}
+              <div className="hidden flex-1 flex-col border-2 border-primary bg-card shadow-[4px_4px_0_0_hsl(var(--primary))] sm:flex">
+                {hero && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={hero}
+                    alt={pack.title}
+                    className="aspect-[4/3] w-full border-b-2 border-primary object-cover"
+                  />
+                )}
+                <div className="flex flex-1 flex-col p-5">
+                  <h3 className="font-serif text-xl font-bold uppercase tracking-wide">
+                    {pack.title}
+                  </h3>
+                  <p className="mt-0.5 text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
+                    {pack.serves} · ~{perHead}/guest
+                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">{pack.blurb}</p>
+
+                  <details className="group mt-3">
+                    <summary className="flex cursor-pointer list-none items-center gap-1 text-xs font-bold uppercase tracking-widest text-primary [&::-webkit-details-marker]:hidden">
+                      See what&rsquo;s inside
+                      <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
+                    </summary>
+                    <ul className="mt-2 space-y-1 text-sm text-foreground/70">
+                      {lines.map((l) => (
+                        <li key={l.item.id}>
+                          {l.qty}× {l.item.name}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+
+                  <div className="mt-auto flex items-end justify-between pt-4">
+                    <div>
+                      <p className="text-lg font-bold">{formatPrice(totalCents, menu.currency)}</p>
+                      <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                        {itemCount} pieces
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => addPack(pack)}
+                      className="border-2 border-primary bg-primary px-5 py-2 text-sm font-bold uppercase tracking-widest text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_hsl(var(--primary))]"
+                    >
+                      Add
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
