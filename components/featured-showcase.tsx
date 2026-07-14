@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useReducedMotion } from "framer-motion";
 
 /**
- * Curated "featured creations" row — signature items with real food photography
- * (default shot, warmer variation on hover). The row is drag-to-scroll on
- * desktop (click and drag) and swipe on touch. Photos live in
- * /public/images/featured.
+ * Curated "featured creations" row — signature items with real food photography.
+ * Each card auto-cross-fades between its two photos every 3s, staggered 0.5s per
+ * card so the flip ripples across the row (a constant rotation). Hovering also
+ * reveals the alternate photo. The row is drag-to-scroll on desktop, swipe on
+ * touch. Photos live in /public/images/featured.
  */
 type Feature = {
   name: string;
@@ -24,6 +26,74 @@ const FEATURES: Feature[] = [
   { name: "Nutella Scroll", price: "$9.40", over: "/images/featured/nutella-scroll.jpg", close: "/images/featured/nutella-scroll-hover.jpg" },
   { name: "Chicken & Dill Wrap", price: "$10.90", over: "/images/featured/chicken-wrap.jpg", close: "/images/featured/chicken-wrap-hover.jpg" },
 ];
+
+const ROTATE_MS = 3000;
+const STAGGER_MS = 500;
+
+/** One card: auto-flips its two photos on a staggered loop; hover reveals the alt. */
+function FeatureCard({ f, index }: { f: Feature; index: number }) {
+  const [autoClose, setAutoClose] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const reduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    let interval: ReturnType<typeof setInterval> | undefined;
+    // Offset each card by 0.5s so the flips ripple across the row.
+    const start = setTimeout(() => {
+      setAutoClose((v) => !v);
+      interval = setInterval(() => setAutoClose((v) => !v), ROTATE_MS);
+    }, index * STAGGER_MS);
+    return () => {
+      clearTimeout(start);
+      if (interval) clearInterval(interval);
+    };
+  }, [index, reduceMotion]);
+
+  const showClose = hovered || autoClose;
+
+  return (
+    <li className="w-[72%] flex-none sm:w-[44%] lg:w-[calc((100%-4*1.5rem)/5)]">
+      <Link
+        href="/pre-order"
+        className="group block"
+        draggable={false}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        <div className="relative aspect-[3/4] w-full overflow-hidden border-2 border-primary bg-card">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={f.over}
+            alt={f.name}
+            loading="lazy"
+            decoding="async"
+            draggable={false}
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+              showClose ? "opacity-0" : "opacity-100"
+            }`}
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={f.close}
+            alt=""
+            aria-hidden
+            loading="lazy"
+            decoding="async"
+            draggable={false}
+            className={`absolute inset-0 h-full w-full scale-105 object-cover transition-opacity duration-700 ${
+              showClose ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        </div>
+        <div className="mt-3">
+          <h3 className="font-serif text-base font-semibold uppercase tracking-wide">{f.name}</h3>
+          <p className="mt-0.5 text-sm text-muted-foreground">{f.price}</p>
+        </div>
+      </Link>
+    </li>
+  );
+}
 
 export function FeaturedShowcase() {
   const rowRef = useRef<HTMLUListElement>(null);
@@ -86,36 +156,8 @@ export function FeaturedShowcase() {
           onClickCapture={onClickCapture}
           className="-mx-5 flex cursor-grab select-none gap-5 overflow-x-auto px-5 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] active:cursor-grabbing md:mx-0 md:gap-6 md:px-0 [&::-webkit-scrollbar]:hidden"
         >
-          {FEATURES.map((f) => (
-            <li key={f.name} className="w-[72%] flex-none sm:w-[44%] lg:w-[calc((100%-4*1.5rem)/5)]">
-              <Link href="/pre-order" className="group block" draggable={false}>
-                <div className="relative aspect-[3/4] w-full overflow-hidden border-2 border-primary bg-card">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={f.over}
-                    alt={f.name}
-                    loading="lazy"
-                    decoding="async"
-                    draggable={false}
-                    className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 group-hover:opacity-0"
-                  />
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={f.close}
-                    alt=""
-                    aria-hidden
-                    loading="lazy"
-                    decoding="async"
-                    draggable={false}
-                    className="absolute inset-0 h-full w-full scale-105 object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                  />
-                </div>
-                <div className="mt-3">
-                  <h3 className="font-serif text-base font-semibold uppercase tracking-wide">{f.name}</h3>
-                  <p className="mt-0.5 text-sm text-muted-foreground">{f.price}</p>
-                </div>
-              </Link>
-            </li>
+          {FEATURES.map((f, i) => (
+            <FeatureCard key={f.name} f={f} index={i} />
           ))}
         </ul>
       </div>

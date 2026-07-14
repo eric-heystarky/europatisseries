@@ -96,6 +96,7 @@ function EventPlanner({ menu, byName }: { menu: Menu; byName: Map<string, MenuIt
   const { openDrawer } = useCart();
   const [guests, setGuests] = useState(10);
   const [style, setStyle] = useState<EventStyleId>("lunch");
+  const [open, setOpen] = useState(false);
 
   const g = Math.max(1, guests || 1);
   const recs = recommendPacks(g, style);
@@ -127,17 +128,31 @@ function EventPlanner({ menu, byName }: { menu: Menu; byName: Map<string, MenuIt
 
   return (
     <div className="border-2 border-primary bg-primary text-primary-foreground shadow-[6px_6px_0_0_hsl(var(--primary))]">
-      <div className="px-6 pt-7 text-center sm:px-8">
-        <p className="text-xs uppercase tracking-[0.35em] text-primary-foreground/60">
-          Start here
-        </p>
-        <h2 className="mt-1 font-shorelines text-5xl md:text-6xl">Plan my spread</h2>
-        <p className="mx-auto mt-2 max-w-md text-sm text-primary-foreground/75">
-          Two quick questions and we&rsquo;ll put together the perfect order.
-        </p>
-      </div>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-4 px-6 py-6 text-left sm:px-8"
+      >
+        <span>
+          <span className="text-xs uppercase tracking-[0.35em] text-primary-foreground/60">
+            Start here
+          </span>
+          <span className="mt-1 block font-shorelines text-5xl md:text-6xl">Plan my spread</span>
+          <span className="mt-1 block max-w-md text-sm text-primary-foreground/75">
+            {open
+              ? "Two quick questions and we’ll put together the perfect order."
+              : "Tap to answer two quick questions — we’ll suggest the perfect order."}
+          </span>
+        </span>
+        <ChevronDown
+          className={`h-8 w-8 flex-none transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
 
-      <div className="mt-6 grid gap-px bg-primary-foreground/20 md:grid-cols-2">
+      {open && (
+      <>
+      <div className="grid gap-px bg-primary-foreground/20 md:grid-cols-2">
         {/* Step 1 — headcount */}
         <div className="bg-primary p-6 sm:p-8">
           <label className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/60">
@@ -280,6 +295,8 @@ function EventPlanner({ menu, byName }: { menu: Menu; byName: Map<string, MenuIt
           build your own below.
         </p>
       </div>
+      </>
+      )}
     </div>
   );
 }
