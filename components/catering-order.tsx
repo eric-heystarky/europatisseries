@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Clock, DollarSign, Truck, ShoppingBag, ChevronDown } from "lucide-react";
+import { Clock, DollarSign, Truck, ShoppingBag, ChevronDown, Check } from "lucide-react";
 import type { Menu, MenuItem } from "@/lib/menu";
 import { formatPrice } from "@/lib/format";
 import { useCart } from "./cart-context";
@@ -47,19 +47,21 @@ export function CateringOrder({ menu }: { menu: Menu }) {
 
   return (
     <div className="mx-auto max-w-6xl px-5 pb-40">
-      {/* 1 — Guided planner (the primary path) */}
+      {/* 1 — Ready-made packs (the primary path) */}
       <div className="-mt-10">
+        <PacksSection menu={menu} byName={byName} />
+      </div>
+
+      {/* 2 — Guided planner (secondary path) */}
+      <div className="mt-16">
         <EventPlanner menu={menu} byName={byName} />
       </div>
 
-      {/* 2 — How catering works (trust strip) */}
-      <HowItWorks currency={menu.currency} />
-
-      {/* 3 — Ready-made packs */}
-      <PacksSection menu={menu} byName={byName} />
-
-      {/* 4 — Build your own (secondary) */}
+      {/* 3 — Build your own (secondary) */}
       <BuildYourOwn menu={menu} />
+
+      {/* 4 — How catering works (trust strip) — page footer */}
+      <HowItWorks currency={menu.currency} />
     </div>
   );
 }
@@ -73,7 +75,7 @@ function HowItWorks({ currency }: { currency: string }) {
     { icon: Truck, title: "Free over $150", sub: "Delivery within our area" },
   ];
   return (
-    <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden border-2 border-primary bg-primary md:grid-cols-4">
+    <div className="mt-16 grid grid-cols-2 gap-px overflow-hidden border-2 border-primary bg-primary md:grid-cols-4">
       {items.map(({ icon: Icon, title, sub }) => (
         <div key={title} className="flex items-center gap-3 bg-card px-4 py-4">
           <Icon className="h-6 w-6 flex-none" strokeWidth={1.5} />
@@ -136,7 +138,7 @@ function EventPlanner({ menu, byName }: { menu: Menu; byName: Map<string, MenuIt
       >
         <span>
           <span className="text-xs uppercase tracking-[0.35em] text-primary-foreground/60">
-            Start here
+            Or, need a hand?
           </span>
           <span className="mt-1 block font-shorelines text-5xl md:text-6xl">Plan my spread</span>
           <span className="mt-1 block max-w-md text-sm text-primary-foreground/75">
@@ -207,28 +209,45 @@ function EventPlanner({ menu, byName }: { menu: Menu; byName: Map<string, MenuIt
             2 · What&rsquo;s the occasion?
           </label>
           <div className="mt-3 grid grid-cols-2 gap-2">
-            {EVENT_STYLES.map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => setStyle(s.id)}
-                className={`flex flex-col items-start border-2 p-3 text-left transition-colors ${
-                  style === s.id
-                    ? "border-primary-foreground bg-primary-foreground text-primary"
-                    : "border-primary-foreground/40 hover:border-primary-foreground"
-                }`}
-              >
-                <span className="text-xl leading-none">{s.emoji}</span>
-                <span className="mt-1.5 text-sm font-bold leading-tight">{s.label}</span>
-                <span
-                  className={`text-[11px] ${
-                    style === s.id ? "text-primary/70" : "text-primary-foreground/60"
+            {EVENT_STYLES.map((s) => {
+              const active = style === s.id;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => setStyle(s.id)}
+                  aria-pressed={active}
+                  className={`group relative aspect-[4/3] overflow-hidden border-2 text-left transition-all ${
+                    active
+                      ? "border-primary-foreground shadow-[4px_4px_0_0_hsl(var(--primary-foreground))]"
+                      : "border-primary-foreground/40 hover:border-primary-foreground"
                   }`}
                 >
-                  {s.hint}
-                </span>
-              </button>
-            ))}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={s.image}
+                    alt={s.label}
+                    className={`absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${
+                      active ? "" : "opacity-90"
+                    }`}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/40 to-primary/5" />
+                  {active && (
+                    <span className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center border-2 border-primary bg-primary-foreground text-primary">
+                      <Check className="h-4 w-4" strokeWidth={3} />
+                    </span>
+                  )}
+                  <div className="absolute inset-x-0 bottom-0 p-3 text-primary-foreground">
+                    <span className="block text-sm font-bold uppercase leading-tight tracking-wide [text-shadow:0_1px_6px_rgba(0,0,0,0.5)]">
+                      {s.label}
+                    </span>
+                    <span className="mt-0.5 block text-[11px] text-primary-foreground/80">
+                      {s.hint}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -244,23 +263,40 @@ function EventPlanner({ menu, byName }: { menu: Menu; byName: Map<string, MenuIt
           </p>
         </div>
 
-        <ul className="mt-4 space-y-2">
-          {resolved.map((r) => (
-            <li
-              key={r.pack.id}
-              className="flex items-center justify-between gap-3 border-2 border-primary/15 p-3"
-            >
-              <span className="font-semibold">
-                {r.qty}× {r.pack.title}
-                <span className="ml-2 text-xs font-normal uppercase tracking-wide text-primary/50">
-                  {r.pack.serves}
-                </span>
-              </span>
-              <span className="flex-none font-bold tabular-nums">
-                {money(r.resolved.totalCents * r.qty)}
-              </span>
-            </li>
-          ))}
+        <ul className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {resolved.map((r) => {
+            const hero = r.resolved.lines.find((l) => l.item.imageUrl)?.item.imageUrl ?? null;
+            return (
+              <li
+                key={r.pack.id}
+                className="relative aspect-[4/5] overflow-hidden border-2 border-primary shadow-[3px_3px_0_0_hsl(var(--primary))]"
+              >
+                {hero ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={hero} alt={r.pack.title} className="absolute inset-0 h-full w-full object-cover" />
+                ) : (
+                  <div className="absolute inset-0 bg-primary" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-black/85" />
+                {r.qty > 1 && (
+                  <span className="absolute left-2 top-2 flex h-7 min-w-7 items-center justify-center border-2 border-white bg-white px-1.5 text-sm font-bold tabular-nums text-primary">
+                    {r.qty}×
+                  </span>
+                )}
+                <h4 className="absolute inset-x-3 top-3 pr-8 font-serif text-sm font-bold uppercase leading-tight tracking-wide text-white [text-shadow:0_1px_6px_rgba(0,0,0,0.6)]">
+                  {r.pack.title}
+                </h4>
+                <div className="absolute inset-x-3 bottom-3 text-white">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-white/85">
+                    {r.pack.serves}
+                  </p>
+                  <p className="mt-0.5 text-base font-bold [text-shadow:0_1px_6px_rgba(0,0,0,0.6)]">
+                    {money(r.resolved.totalCents * r.qty)}
+                  </p>
+                </div>
+              </li>
+            );
+          })}
         </ul>
 
         <div className="mt-4 flex flex-col gap-4 border-t-2 border-primary/15 pt-4 sm:flex-row sm:items-center sm:justify-between">
@@ -321,9 +357,9 @@ function PacksSection({ menu, byName }: { menu: Menu; byName: Map<string, MenuIt
     <div className="mt-16">
       <div className="text-center">
         <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
-          Or pick a ready-made platter
+          Best-sellers · ready in one tap
         </p>
-        <h2 className="mt-1 font-shorelines text-4xl md:text-5xl">Our Packs</h2>
+        <h2 className="mt-1 font-shorelines text-4xl md:text-5xl">Pick a Ready-Made Platter</h2>
       </div>
 
       <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
@@ -519,52 +555,67 @@ function CustomPackBuilder({ menu }: { menu: Menu }) {
         ))}
       </div>
 
-      {/* Items in the active category */}
-      <div className="grid gap-3 p-4 sm:grid-cols-2">
+      {/* Items in the active category — image-first tiles like the packs */}
+      <div className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
         {cat?.items.map((it) => {
           const n = qty[it.id] ?? 0;
           return (
             <div
               key={it.id}
-              className={`flex items-center gap-3 border-2 p-3 transition-colors ${
-                n > 0 ? "border-primary bg-primary/5" : "border-primary/20"
+              className={`relative aspect-[4/5] overflow-hidden border-2 border-primary shadow-[3px_3px_0_0_hsl(var(--primary))] transition-all ${
+                n > 0 ? "ring-2 ring-primary ring-offset-2 ring-offset-card" : ""
               }`}
             >
               {it.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={it.imageUrl}
-                  alt=""
-                  className="h-14 w-14 flex-none border-2 border-primary/40 object-cover"
+                  alt={it.name}
+                  className="absolute inset-0 h-full w-full object-cover"
                 />
               ) : (
-                <div className="h-14 w-14 flex-none border-2 border-primary/20 bg-muted" />
+                <div className="absolute inset-0 bg-primary" />
               )}
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold">{it.name}</p>
-                <p className="text-xs text-muted-foreground">
+              <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/85" />
+              <h4 className="absolute inset-x-3 top-3 font-serif text-sm font-bold uppercase leading-tight tracking-wide text-white [text-shadow:0_1px_6px_rgba(0,0,0,0.6)]">
+                {it.name}
+              </h4>
+              <div className="absolute inset-x-3 bottom-3 flex items-center justify-between gap-2 text-white">
+                <span className="text-sm font-bold [text-shadow:0_1px_6px_rgba(0,0,0,0.6)]">
                   {formatPrice(unit(it), menu.currency)}
-                </p>
-              </div>
-              <div className="flex flex-none items-center gap-2">
-                <button
-                  type="button"
-                  aria-label={`Remove one ${it.name}`}
-                  onClick={() => bump(it.id, -1)}
-                  disabled={n === 0}
-                  className="h-8 w-8 border-2 border-primary font-bold leading-none disabled:opacity-30"
-                >
-                  −
-                </button>
-                <span className="w-5 text-center text-sm font-bold tabular-nums">{n}</span>
-                <button
-                  type="button"
-                  aria-label={`Add one ${it.name}`}
-                  onClick={() => bump(it.id, 1)}
-                  className="h-8 w-8 border-2 border-primary bg-primary font-bold leading-none text-primary-foreground"
-                >
-                  +
-                </button>
+                </span>
+                {n === 0 ? (
+                  <button
+                    type="button"
+                    aria-label={`Add ${it.name}`}
+                    onClick={() => bump(it.id, 1)}
+                    className="border-2 border-white bg-white px-3 py-1 text-xs font-bold uppercase tracking-widest text-primary active:scale-95"
+                  >
+                    Add
+                  </button>
+                ) : (
+                  <span className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      aria-label={`Remove one ${it.name}`}
+                      onClick={() => bump(it.id, -1)}
+                      className="flex h-7 w-7 items-center justify-center border-2 border-white bg-black/30 text-base font-bold leading-none text-white backdrop-blur-sm active:scale-95"
+                    >
+                      −
+                    </button>
+                    <span className="w-5 text-center text-sm font-bold tabular-nums [text-shadow:0_1px_6px_rgba(0,0,0,0.6)]">
+                      {n}
+                    </span>
+                    <button
+                      type="button"
+                      aria-label={`Add one ${it.name}`}
+                      onClick={() => bump(it.id, 1)}
+                      className="flex h-7 w-7 items-center justify-center border-2 border-white bg-white text-base font-bold leading-none text-primary active:scale-95"
+                    >
+                      +
+                    </button>
+                  </span>
+                )}
               </div>
             </div>
           );

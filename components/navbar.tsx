@@ -48,7 +48,7 @@ export function Navbar() {
           {Array.from({ length: 7 }).map((_, i) => (
             <span key={i} className="flex shrink-0">
               <span className="mx-4">★ ORDER NOW ONLINE</span>
-              <span className="mx-4">★ OPEN TUES-SUN 7AM-3PM</span>
+              <span className="mx-4">★ OPEN 7 DAYS 7AM-3PM</span>
             </span>
           ))}
         </div>

@@ -172,14 +172,15 @@ export type EventStyle = {
   label: string;
   emoji: string;
   hint: string;
+  image: string;
 };
 
 /** The occasions a client picks from in the planner. */
 export const EVENT_STYLES: EventStyle[] = [
-  { id: "breakfast", label: "Breakfast", emoji: "🥐", hint: "Croissants & pastries" },
-  { id: "morning-tea", label: "Morning / Afternoon Tea", emoji: "🍰", hint: "Sweet treats" },
-  { id: "lunch", label: "Lunch", emoji: "🥪", hint: "Wraps, toasties & hot bites" },
-  { id: "mixed", label: "Mixed Grazing", emoji: "🎉", hint: "A bit of everything" },
+  { id: "breakfast", label: "Breakfast", emoji: "🥐", hint: "Croissants & pastries", image: "/images/catering/croissant-flatlay.jpg" },
+  { id: "morning-tea", label: "Morning / Afternoon Tea", emoji: "🍰", hint: "Sweet treats", image: "/images/catering/lemon-tart.jpg" },
+  { id: "lunch", label: "Lunch", emoji: "🥪", hint: "Wraps, toasties & hot bites", image: "/images/featured/chicken-wrap.jpg" },
+  { id: "mixed", label: "Mixed Grazing", emoji: "🎉", hint: "A bit of everything", image: "/images/catering/buffet.jpg" },
 ];
 
 export type Recommendation = { pack: PackDef; qty: number };
