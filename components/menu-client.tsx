@@ -88,58 +88,50 @@ export function MenuClient({ menu }: { menu: Menu }) {
               {openCategory.name}
             </h2>
 
-            {/* Mobile: Square-style tappable rows */}
-            <ul className="mt-4 border-t-2 border-border md:hidden">
+            {/* Mobile: image-first tiles (matches the catering packs) */}
+            <div className="mt-4 grid grid-cols-2 gap-3 md:hidden">
               {openCategory.items.map((item) => {
                 const prices = item.variations.map((v) => v.priceCents);
                 const min = prices.length ? Math.min(...prices) : 0;
                 const multi = item.variations.length > 1;
                 const hasOptions = multi || item.modifierLists.length > 0;
                 return (
-                  <li key={item.id}>
-                    <button
-                      onClick={() => setActiveItem(item)}
-                      className="group flex w-full items-stretch gap-4 border-b-2 border-border py-4 text-left transition hover:bg-primary/5"
-                    >
-                      <div className="flex min-w-0 flex-1 flex-col">
-                        <h3 className="font-serif text-lg font-semibold leading-tight">{item.name}</h3>
-                        {item.description && (
-                          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{item.description}</p>
-                        )}
-                        <div className="mt-auto flex items-center gap-3 pt-2">
-                          <span className="font-bold tabular-nums">
-                            {multi ? "from " : ""}
-                            {formatPrice(min, menu.currency)}
-                          </span>
-                          {hasOptions && (
-                            <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
-                              Options
-                            </span>
-                          )}
-                        </div>
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveItem(item)}
+                    className="relative aspect-[4/5] overflow-hidden border-2 border-primary text-left shadow-[3px_3px_0_0_hsl(var(--primary))] active:translate-x-px active:translate-y-px"
+                  >
+                    {item.imageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        loading="lazy"
+                        decoding="async"
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center bg-primary text-4xl font-light text-primary-foreground/30">
+                        +
                       </div>
-                      {item.imageUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={item.imageUrl}
-                          alt={item.name}
-                          loading="lazy"
-                          decoding="async"
-                          className="h-24 w-24 flex-none border-2 border-border object-cover"
-                        />
-                      ) : (
-                        <span
-                          aria-hidden
-                          className="flex h-24 w-24 flex-none items-center justify-center border-2 border-border bg-card text-3xl font-light text-primary/30 transition group-hover:bg-primary group-hover:text-primary-foreground"
-                        >
-                          +
-                        </span>
-                      )}
-                    </button>
-                  </li>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/85" />
+                    <h3 className="absolute inset-x-3 top-3 font-serif text-sm font-bold uppercase leading-tight tracking-wide text-white [text-shadow:0_1px_6px_rgba(0,0,0,0.6)]">
+                      {item.name}
+                    </h3>
+                    <div className="absolute inset-x-3 bottom-3 flex items-center justify-between gap-2 text-white">
+                      <span className="text-sm font-bold tabular-nums [text-shadow:0_1px_6px_rgba(0,0,0,0.6)]">
+                        {multi ? "from " : ""}
+                        {formatPrice(min, menu.currency)}
+                      </span>
+                      <span className="border-2 border-white bg-white px-3 py-1 text-xs font-bold uppercase tracking-widest text-primary">
+                        {hasOptions ? "Options" : "Add"}
+                      </span>
+                    </div>
+                  </button>
                 );
               })}
-            </ul>
+            </div>
 
             {/* Tablet & desktop: grid with photos */}
             <div className="mt-8 hidden gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">
