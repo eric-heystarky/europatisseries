@@ -138,7 +138,7 @@ function EventPlanner({ menu, byName }: { menu: Menu; byName: Map<string, MenuIt
           <span className="text-xs uppercase tracking-[0.35em] text-primary-foreground/60">
             Start here
           </span>
-          <span className="mt-1 block font-shorelines text-4xl sm:text-5xl md:text-6xl">Plan my spread</span>
+          <span className="mt-1 block font-shorelines text-5xl md:text-6xl">Plan my spread</span>
           <span className="mt-1 block max-w-md text-sm text-primary-foreground/75">
             {open
               ? "Two quick questions and we’ll put together the perfect order."
@@ -434,7 +434,7 @@ function BuildYourOwn({ menu }: { menu: Menu }) {
         className="flex w-full items-center justify-between gap-4 border-2 border-primary bg-card p-5 text-left shadow-[4px_4px_0_0_hsl(var(--primary))]"
       >
         <span>
-          <span className="font-shorelines text-2xl sm:text-3xl md:text-4xl">Build your own pack</span>
+          <span className="font-shorelines text-3xl md:text-4xl">Build your own pack</span>
           <span className="mt-0.5 block text-sm text-muted-foreground">
             Prefer full control? Pick any mix of items — it all counts toward your discount.
           </span>
@@ -501,14 +501,14 @@ function CustomPackBuilder({ menu }: { menu: Menu }) {
 
   return (
     <div className="border-x-2 border-b-2 border-primary bg-card">
-      {/* Category tabs — swipeable row on mobile */}
-      <div className="flex gap-2 overflow-x-auto border-b-2 border-primary/20 p-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {/* Category tabs */}
+      <div className="flex flex-wrap gap-2 border-b-2 border-primary/20 p-4">
         {foodCats.map((c) => (
           <button
             key={c.id}
             type="button"
             onClick={() => setActiveCat(c.id)}
-            className={`flex-none whitespace-nowrap border-2 px-4 py-1.5 text-xs font-bold uppercase tracking-widest transition-colors ${
+            className={`border-2 px-4 py-1.5 text-xs font-bold uppercase tracking-widest transition-colors ${
               c.id === (cat?.id ?? "")
                 ? "border-primary bg-primary text-primary-foreground"
                 : "border-primary/40 bg-transparent text-foreground hover:border-primary"
