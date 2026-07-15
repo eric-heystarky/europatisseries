@@ -8,7 +8,7 @@ export const siteUrl =
 export const BUSINESS = {
   name: "Euro Patisserie Armadale",
   phone: "+61 3 9822 1234",
-  email: "hello@europatisserie.com",
+  email: "euro@patisseries.com.au",
   streetAddress: "974 High St",
   locality: "Armadale",
   region: "VIC",

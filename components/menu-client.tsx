@@ -69,7 +69,7 @@ export function MenuClient({ menu }: { menu: Menu }) {
                 </div>
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Contact</p>
-                  <p className="mt-2">hello@europatisserie.com</p>
+                  <p className="mt-2">euro@patisseries.com.au</p>
                   <p>(03) 9822 1234</p>
                 </div>
               </div>

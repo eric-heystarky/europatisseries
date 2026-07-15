@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Navbar } from "./navbar";
 import { Footer } from "./footer";
-import { ScrollToTopButton } from "./ScrollToTopButton";
+import { FloatingWidgets } from "./floating-widgets";
 import { LoadingScreen } from "./LoadingScreen";
 
 /**
@@ -21,7 +21,7 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
       <main className={`flex-1 ${isHomePage ? "pt-[32px] md:pt-[40px]" : "pt-[102px] md:pt-[120px]"}`}>
         {children}
       </main>
-      <ScrollToTopButton />
+      <FloatingWidgets />
       <Footer />
     </>
   );

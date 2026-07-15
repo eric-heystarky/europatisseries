@@ -53,7 +53,7 @@ export default function Contact() {
           <div>
             <h3 className="font-shorelines text-3xl mb-3 border-b-2 border-primary pb-1 inline-block">Contact</h3>
             <p className="text-lg font-medium leading-relaxed">
-              hello@europatisserie.com<br/>
+              euro@patisseries.com.au<br/>
               (03) 9822 1234
             </p>
           </div>

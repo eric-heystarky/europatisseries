@@ -78,7 +78,7 @@ export default function CafePage() {
         <div className="p-8 md:p-12">
           <h3 className="font-shorelines text-3xl">Contact</h3>
           <p className="mt-3 text-lg font-medium leading-relaxed">
-            hello@europatisserie.com<br />
+            euro@patisseries.com.au<br />
             (03) 9822 1234
           </p>
         </div>
