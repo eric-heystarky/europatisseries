@@ -36,7 +36,7 @@ export default function CafePage() {
         <div className="absolute inset-0 bg-black/40" />
         <AnimatedSection className="relative z-10 p-8 text-white md:p-16">
           <p className="text-xs uppercase tracking-[0.35em] text-white/70">Armadale · Dine In</p>
-          <h1 className="mt-3 break-words font-shorelines text-5xl leading-none md:text-8xl">The Café</h1>
+          <h1 className="mt-3 break-words font-shorelines text-5xl leading-none md:text-8xl">The Cafe</h1>
           <p className="mt-6 max-w-xl text-lg font-light leading-relaxed text-white/90">
             Buttery viennoiserie, French cakes and proper coffee — served fresh in our light-filled
             Armadale café and leafy, dog-friendly courtyard.
