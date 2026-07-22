@@ -10,6 +10,7 @@ import { AnimatedSection } from "@/components/AnimatedSection";
 import { FeaturedShowcase } from "@/components/featured-showcase";
 import { WhyEuro } from "@/components/why-euro";
 import { RotatingCollage } from "@/components/rotating-collage";
+import { FaqSection } from "@/components/faq-section";
 
 type Tile = {
   title: string;
@@ -289,6 +290,8 @@ export default function Index() {
         {/* CommonNinja SDK — renders the Instagram feed into the div above. */}
         <Script src="https://cdn.commoninja.com/sdk/latest/commonninja.js" strategy="lazyOnload" />
       </section>
+
+      <FaqSection />
     </div>
   );
 }

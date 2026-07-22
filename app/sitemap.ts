@@ -9,7 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/catering", priority: 0.8, freq: "weekly" },
     { path: "/about", priority: 0.7, freq: "monthly" },
     { path: "/gift-cards", priority: 0.7, freq: "monthly" },
-    { path: "/faq", priority: 0.6, freq: "monthly" },
+    { path: "/cafe", priority: 0.6, freq: "monthly" },
     { path: "/contact", priority: 0.6, freq: "monthly" },
     { path: "/join-team", priority: 0.5, freq: "monthly" },
   ];

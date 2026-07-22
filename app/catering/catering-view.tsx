@@ -12,7 +12,7 @@ export default function Catering({ menu }: { menu: Menu }) {
       <AnimatedSection className="border-b-2 border-primary bg-primary px-4 pb-16 pt-20 text-primary-foreground md:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-xs uppercase tracking-[0.35em] text-primary-foreground/60">
-            Euro Patisserie · Catering
+            Euro Patisserie · Catering &amp; Events
           </p>
           <h1 className="mb-4 mt-2 font-shorelines text-6xl md:text-7xl">catering made easy</h1>
           <p className="mx-auto max-w-xl text-base font-medium text-primary-foreground/85 md:text-lg">

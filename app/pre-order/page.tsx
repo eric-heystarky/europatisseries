@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getCachedMenu } from "@/lib/menu";
 import { MenuClient } from "@/components/menu-client";
+import { FaqSection } from "@/components/faq-section";
 
 // Live menu — render at request time (cached 5 min via getCachedMenu), never prerendered at build.
 export const dynamic = "force-dynamic";
@@ -50,6 +51,7 @@ export default async function PreOrderPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
       />
       <MenuClient menu={menu} />
+      <FaqSection />
     </>
   );
 }

@@ -40,8 +40,8 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
     a: (
       <>
         Absolutely — wedding cakes, grand entremets, cocktail pieces, buffets and more. See the{" "}
-        <Link href="/catering" className="underline underline-offset-2">catering page</Link> or send an enquiry.
-        For large orders we recommend at least 48 hours&apos; notice.
+        <Link href="/catering" className="underline underline-offset-2">catering &amp; events page</Link> or send
+        an enquiry. For large orders we recommend at least 48 hours&apos; notice.
       </>
     ),
   },
@@ -52,6 +52,16 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
         We carry gluten-free and vegetarian options (look for them on the menu). However, everything is made in a
         kitchen that handles nuts, gluten, dairy and eggs, so we can&apos;t guarantee any item is completely
         allergen-free. Please ask us about specific requirements.
+      </>
+    ),
+  },
+  {
+    q: "Are you dog friendly?",
+    a: (
+      <>
+        Yes! Our leafy Armadale courtyard is made for lazy mornings with your pup by your side — water bowls and a
+        warm welcome are always on the house. See <Link href="/cafe" className="underline underline-offset-2">the
+        café</Link> for more.
       </>
     ),
   },
@@ -68,29 +78,30 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
     q: "What are your opening hours?",
     a: (
       <>
-        <strong>Tuesday–Sunday, 7am–3pm.</strong> Closed Mondays. Order online any time and we&apos;ll have it
-        ready in opening hours.
+        <strong>Open 7 days, 7am–3pm.</strong> Order online any time and we&apos;ll have it ready in opening
+        hours.
       </>
     ),
   },
 ];
 
-export default function FaqPage() {
-  const [open, setOpen] = useState<number | null>(0);
+/**
+ * Reusable FAQ accordion, dropped in near the bottom of every main page
+ * (replaces the old standalone /faq route). Self-contained: its own heading,
+ * the accordion, and a "still have a question" contact CTA.
+ */
+export function FaqSection({ className = "" }: { className?: string }) {
+  const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Hero */}
-      <section className="border-b-2 border-primary bg-primary px-5 py-20 text-center text-primary-foreground">
-        <p className="text-xs uppercase tracking-[0.35em] text-primary-foreground/60">Good to know</p>
-        <h1 className="mt-2 font-shorelines text-7xl leading-none md:text-8xl">FAQ</h1>
-        <p className="mx-auto mt-4 max-w-md text-sm uppercase tracking-[0.15em] text-primary-foreground/70">
-          Everything about ordering, delivery, catering & more.
-        </p>
-      </section>
+    <section className={`border-t-2 border-primary bg-background px-5 py-16 md:py-20 ${className}`}>
+      <div className="mx-auto max-w-3xl">
+        <AnimatedSection className="text-center">
+          <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Good to know</p>
+          <h2 className="mt-2 font-shorelines text-5xl leading-none md:text-6xl">FAQ</h2>
+        </AnimatedSection>
 
-      <AnimatedSection className="mx-auto max-w-3xl px-5 py-16">
-        <ul className="border-2 border-border divide-y-2 divide-border">
+        <ul className="mt-10 divide-y-2 divide-border border-2 border-border">
           {FAQS.map((item, i) => {
             const isOpen = open === i;
             return (
@@ -121,7 +132,6 @@ export default function FaqPage() {
           })}
         </ul>
 
-        {/* Still have questions */}
         <div className="mt-10 border-2 border-border bg-card p-6 text-center">
           <p className="font-serif text-xl font-semibold uppercase tracking-wide">Still have a question?</p>
           <p className="mt-2 text-sm text-muted-foreground">We&apos;re happy to help — get in touch.</p>
@@ -129,7 +139,7 @@ export default function FaqPage() {
             Contact Us
           </Link>
         </div>
-      </AnimatedSection>
-    </div>
+      </div>
+    </section>
   );
 }

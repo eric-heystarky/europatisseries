@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Gift, Mail, CreditCard } from "lucide-react";
 import { AnimatedSection } from "@/components/AnimatedSection";
+import { FaqSection } from "@/components/faq-section";
 
 export const metadata: Metadata = {
   title: "Gift Cards",
@@ -119,6 +120,8 @@ export default function GiftCardsPage() {
           </div>
         </div>
       </section>
+
+      <FaqSection />
     </div>
   );
 }

@@ -21,7 +21,7 @@ export function Footer() {
         <div className="flex flex-col items-center text-center p-6 md:p-12 border-b-2 lg:border-b-0 lg:border-r-2 border-primary">
           <Store className="w-7 h-7 md:w-8 md:h-8 mb-4 md:mb-6" strokeWidth={1} />
           <h4 className="font-bold tracking-widest uppercase mb-2 md:mb-4 text-xs md:text-sm">IN-STORE PURCHASE</h4>
-          <p className="text-xs md:text-sm font-medium opacity-80">Tues-Sun 7AM - 3PM</p>
+          <p className="text-xs md:text-sm font-medium opacity-80">Open 7 Days · 7AM - 3PM</p>
         </div>
         <div className="flex flex-col items-center text-center p-6 md:p-12 border-r-2 border-primary">
           <MapPin className="w-7 h-7 md:w-8 md:h-8 mb-4 md:mb-6" strokeWidth={1} />

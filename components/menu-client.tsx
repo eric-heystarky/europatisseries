@@ -64,8 +64,7 @@ export function MenuClient({ menu }: { menu: Menu }) {
                 </div>
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Hours</p>
-                  <p className="mt-2">Tues–Sun · 7am–3pm</p>
-                  <p>Monday · Closed</p>
+                  <p className="mt-2">Open 7 days · 7am–3pm</p>
                 </div>
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Contact</p>

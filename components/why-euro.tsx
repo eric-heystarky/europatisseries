@@ -4,7 +4,7 @@ import { RotatingWord } from "./rotating-word";
 
 /**
  * Homepage "Why Euro Patisserie" value-prop section — the Australian flour +
- * French ingredients story, with a link to the full /our-craft page.
+ * French ingredients story, with a link to the full /about page.
  */
 const PILLARS = [
   {
@@ -65,7 +65,7 @@ export function WhyEuro() {
         </div>
 
         <div className="mt-10 flex justify-center">
-          <Link href="/our-craft" className="btn-brutal px-8 py-3.5 text-xs">
+          <Link href="/about" className="btn-brutal px-8 py-3.5 text-xs">
             Discover Our Craft
             <ArrowRight className="h-4 w-4" />
           </Link>

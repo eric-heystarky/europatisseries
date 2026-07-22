@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AnimatedSection } from "@/components/AnimatedSection";
+import { FaqSection } from "@/components/faq-section";
 
 export const metadata: Metadata = {
   title: "The Café — Dine In at Euro Patisserie Armadale",
   description:
-    "Visit the Euro Patisserie café at 974 High St, Armadale. Dine-in pastries, cakes and coffee, a leafy dog-friendly courtyard, open Tues–Sun 7am–3pm.",
+    "Visit the Euro Patisserie café at 974 High St, Armadale. Dine-in pastries, cakes and coffee, a leafy dog-friendly courtyard, open 7 days 7am–3pm.",
   alternates: { canonical: "/cafe" },
 };
 
@@ -71,8 +72,8 @@ export default function CafePage() {
         <div className="border-b-2 border-primary p-8 md:border-b-0 md:border-r-2 md:p-12">
           <h3 className="font-shorelines text-3xl">Hours</h3>
           <p className="mt-3 text-lg font-medium leading-relaxed">
-            Tues – Sun: 7am – 3pm<br />
-            Mon: Closed
+            Open 7 days<br />
+            7am – 3pm
           </p>
         </div>
         <div className="p-8 md:p-12">
@@ -105,7 +106,7 @@ export default function CafePage() {
             Australian flour and French butter — the same pastries you can pre-order to take home.
           </p>
           <Link
-            href="/our-craft"
+            href="/about"
             className="mt-8 inline-block w-fit border-2 border-primary px-6 py-3 text-xs font-bold uppercase tracking-widest transition hover:bg-primary hover:text-primary-foreground"
           >
             Discover Our Craft
@@ -132,12 +133,14 @@ export default function CafePage() {
             Our outdoor area is made for lazy Armadale mornings — leafy, sunny and always happy to see a
             four-legged guest. Bring your dog, grab a pastry, and settle in.
           </p>
-          <Link
-            href="/dog-friendly"
+          <a
+            href="https://maps.google.com/?q=974+High+St+Armadale+VIC+3143"
+            target="_blank"
+            rel="noreferrer"
             className="mt-8 inline-block w-fit border-2 border-primary px-6 py-3 text-xs font-bold uppercase tracking-widest transition hover:bg-primary hover:text-primary-foreground"
           >
-            More on Dog Friendly
-          </Link>
+            Get Directions
+          </a>
         </AnimatedSection>
       </section>
 
@@ -185,6 +188,8 @@ export default function CafePage() {
           </div>
         </AnimatedSection>
       </section>
+
+      <FaqSection />
     </div>
   );
 }

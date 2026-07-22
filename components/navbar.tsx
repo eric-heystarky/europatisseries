@@ -30,12 +30,9 @@ export function Navbar() {
   const primaryNavLinks = [
     { name: "MENU", path: "/pre-order" },
     { name: "CAFÉ", path: "/cafe" },
-    { name: "CATERING", path: "/catering" },
+    { name: "CATERING & EVENTS", path: "/catering" },
     { name: "GIFT CARDS", path: "/gift-cards" },
     { name: "ABOUT", path: "/about" },
-    { name: "OUR CRAFT", path: "/our-craft" },
-    { name: "FAQ", path: "/faq" },
-    { name: "DOG FRIENDLY", path: "/dog-friendly" },
     { name: "JOIN THE TEAM", path: "/join-team" },
     { name: "CONTACT", path: "/contact" },
   ];
@@ -119,7 +116,7 @@ export function Navbar() {
                   >
                     <SheetClose asChild>
                       <Link
-                        href="/dog-friendly"
+                        href="/cafe"
                         className="group relative block aspect-square w-full overflow-hidden border-2 border-primary"
                       >
                         <img
