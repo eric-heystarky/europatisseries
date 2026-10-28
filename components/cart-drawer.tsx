@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCart, lineUnitPrice } from "./cart-context";
 import { addDays, dayLabel, firstOrderDay, useOrder } from "./order-context";
 import { formatPrice } from "@/lib/format";
@@ -13,6 +14,17 @@ const FREE_DELIVERY_CENTS = 15_000;
 export function CartDrawer({ currency = "AUD" }: { currency?: string }) {
   const { lines, count, subtotalCents, setQty, remove, drawerOpen, closeDrawer } = useCart();
   const order = useOrder();
+  const router = useRouter();
+
+  // Back to the products, not wherever the page was scrolled: the menu section on this page
+  // if there is one (home, /pre-order), otherwise the menu page.
+  function continueShopping() {
+    closeDrawer();
+    const shop = document.getElementById("shop");
+    if (!shop) return router.push("/pre-order");
+    // Wait a frame for the scroll lock to lift before scrolling.
+    requestAnimationFrame(() => shop.scrollIntoView({ behavior: "smooth", block: "start" }));
+  }
 
   const freeRemaining = Math.max(0, FREE_DELIVERY_CENTS - subtotalCents);
   const freePct = Math.min(100, Math.round((subtotalCents / FREE_DELIVERY_CENTS) * 100));
@@ -75,9 +87,9 @@ export function CartDrawer({ currency = "AUD" }: { currency?: string }) {
           {lines.length === 0 ? (
             <div className="flex flex-col items-center gap-5 py-16 text-center">
               <p className="text-[13px] uppercase tracking-[0.14em] text-euro-soft">Your bag is empty</p>
-              <Link href="/#shop" onClick={closeDrawer} className="btn-euro-outline text-euro-ink hover:bg-euro-ink hover:text-white">
+              <button type="button" onClick={continueShopping} className="btn-euro-outline text-euro-ink hover:bg-euro-ink hover:text-white">
                 Browse the menu
-              </Link>
+              </button>
             </div>
           ) : (
             lines.map((line) => {
@@ -163,7 +175,7 @@ export function CartDrawer({ currency = "AUD" }: { currency?: string }) {
                 Proceed to secure checkout
               </Link>
             )}
-            <button onClick={closeDrawer} className="min-h-11 text-[11px] font-medium uppercase tracking-[0.18em] text-euro-ink">
+            <button onClick={continueShopping} className="min-h-11 text-[11px] font-medium uppercase tracking-[0.18em] text-euro-ink">
               Continue shopping
             </button>
           </footer>
