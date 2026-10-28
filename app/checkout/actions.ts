@@ -102,6 +102,11 @@ export async function quoteDelivery(
 }
 
 export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> {
+  // Preview deploys can read the live menu with production keys, but must never create
+  // real orders or take real payments.
+  if (process.env.CHECKOUT_DISABLED === "1") {
+    return { ok: false, error: "Checkout is switched off on this preview — no orders can be placed here." };
+  }
   try {
     if (!input.sourceId) return { ok: false, error: "Missing card token." };
     if (input.lines.length === 0) return { ok: false, error: "Your cart is empty." };

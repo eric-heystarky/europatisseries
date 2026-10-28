@@ -13,6 +13,9 @@ primary_region = "syd"
 
 [env]
   NOINDEX = "1"
+  # The preview may hold the LIVE Square keys (to show the real menu), so ordering is blocked
+  # server-side. The NEXT_PUBLIC_SQUARE_* payment keys are deliberately not set here either.
+  CHECKOUT_DISABLED = "1"
 
 [http_service]
   internal_port = 3000
