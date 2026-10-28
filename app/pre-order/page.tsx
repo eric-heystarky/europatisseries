@@ -20,7 +20,7 @@ export default async function PreOrderPage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const [{ menu, source }, { tab }] = await Promise.all([getMenuOrSample(), searchParams]);
+  const [{ menu, source }, { tab, item }] = await Promise.all([getMenuOrSample(), searchParams]);
   const shop = buildShop(menu, source);
 
   // ItemList of Products for richer search results.
@@ -58,7 +58,14 @@ export default async function PreOrderPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
       />
       <div className="bg-white">
-        <ShopSection shop={shop} variant="full" initialTab={typeof tab === "string" ? tab : undefined} />
+        {/* Keyed so a new search pick re-opens the menu on that item even when already here. */}
+        <ShopSection
+          key={`${tab ?? ""}-${item ?? ""}`}
+          shop={shop}
+          variant="full"
+          initialTab={typeof tab === "string" ? tab : undefined}
+          initialItem={typeof item === "string" ? item : undefined}
+        />
       </div>
       <FaqSection />
     </>

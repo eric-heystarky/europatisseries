@@ -7,6 +7,7 @@ import { useScroll, useMotionValueEvent } from "framer-motion";
 import { Instagram, Search, ShoppingBag } from "lucide-react";
 import { Sheet, SheetClose, SheetContent, SheetTrigger, SheetTitle } from "./ui/sheet";
 import { useCart } from "./cart-context";
+import { SearchDialog } from "./search-dialog";
 
 const LOGO = "/images/logo/euro-patisserie.svg";
 
@@ -51,6 +52,7 @@ export function Navbar() {
   const pathname = usePathname();
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const { count, openDrawer } = useCart();
   const isHomePage = pathname === "/";
 
@@ -211,7 +213,13 @@ export function Navbar() {
             >
               <TikTokIcon className="h-[18px] w-[18px]" />
             </a>
-            <button type="button" aria-label="Search" className="hidden transition-opacity hover:opacity-70 md:block">
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search the menu"
+              aria-haspopup="dialog"
+              className="flex h-11 w-8 items-center justify-center transition-opacity hover:opacity-70"
+            >
               <Search className="h-[19px] w-[19px]" strokeWidth={1.4} />
             </button>
             <button
@@ -235,6 +243,7 @@ export function Navbar() {
           </div>
         </div>
       </nav>
+      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );
 }

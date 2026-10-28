@@ -59,17 +59,22 @@ export function ShopSection({
   shop,
   variant = "home",
   initialTab,
+  initialItem,
 }: {
   shop: Shop;
   variant?: "home" | "full";
   initialTab?: string;
+  /** Opens this item's panel on arrival (e.g. from the header search). */
+  initialItem?: string;
 }) {
   const full = variant === "full";
   const allTabs = [...shop.core, ...shop.more];
   const validTab = initialTab && (initialTab === CATERING || allTabs.some((t) => t.id === initialTab));
   const [tabId, setTabId] = useState(validTab ? initialTab : (shop.core[0]?.id ?? CATERING));
   const [showMore, setShowMore] = useState(false);
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [openId, setOpenId] = useState<string | null>(() =>
+    initialItem && allTabs.some((t) => t.id === initialTab && t.items.some((i) => i.id === initialItem)) ? initialItem : null,
+  );
   const [calOpen, setCalOpen] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const order = useOrder();
