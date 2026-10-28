@@ -307,6 +307,67 @@
   }
 }
 
+/* Order confirmation ("Merci"): pieces rise in one after another (delay set inline),
+   the done step fills, the current step's stroke keeps drawing, the photo settles. */
+.merci-rise {
+  animation: merci-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes merci-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+.merci-fill {
+  transform-origin: left;
+  animation: merci-fill 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+@keyframes merci-fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+/* The current step (Preparing) is still happening: its stroke draws in from the left, then
+   lets go from the left and draws out to the right, on a slow loop. */
+.merci-active {
+  animation: merci-active 2.8s cubic-bezier(0.65, 0, 0.35, 1) infinite both;
+}
+@keyframes merci-active {
+  0% {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  50% {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  50.01% {
+    transform: scaleX(1);
+    transform-origin: right;
+  }
+  100% {
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+}
+.merci-photo {
+  animation: merci-photo 2.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes merci-photo {
+  from {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .merci-rise,
+  .merci-fill,
+  .merci-active,
+  .merci-photo {
+    animation: none;
+  }
+}
+
 /* Subtle page-enter fade — CSS-only so it never affects fixed/sticky layout. */
 @keyframes page-in {
   from {

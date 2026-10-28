@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Jost } from "next/font/google";
+import { Cormorant_Garamond, Jost } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/components/cart-context";
 import { CartDrawer } from "@/components/cart-drawer";
@@ -17,6 +17,15 @@ const jost = Jost({
   subsets: ["latin"],
   weight: ["300", "400", "500"],
   variable: "--font-jost",
+  display: "swap",
+});
+
+// Display serif for the order confirmation ("Merci, Name").
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["500"],
+  style: ["normal", "italic"],
+  variable: "--font-cormorant",
   display: "swap",
 });
 
@@ -76,7 +85,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${jost.variable} ${faro.variable} ${shorelines.variable} h-full antialiased`}
+      className={`${jost.variable} ${cormorant.variable} ${faro.variable} ${shorelines.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         {/* Local-business structured data (Bakery) for local SEO */}

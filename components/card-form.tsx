@@ -118,9 +118,9 @@ export const CardForm = forwardRef<CardFormHandle, { onError?: (msg: string) => 
       <div>
         <div ref={containerRef} className="min-h-[44px] p-1" />
         {!ready && !loadError && (
-          <p className="px-1 pb-1 text-xs text-muted-foreground">Loading secure card field…</p>
+          <p className="px-1 pb-2 text-[12px] text-euro-muted">Loading secure card field…</p>
         )}
-        {loadError && <p className="px-1 pb-1 text-xs text-red-700">{loadError}</p>}
+        {loadError && <p className="px-1 pb-2 text-[12px] text-euro-ink">{loadError}</p>}
       </div>
     );
   },

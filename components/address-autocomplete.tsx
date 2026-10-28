@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { FIELD } from "./form-styles";
+import { useCallback, useEffect, useRef, useState, useLayoutEffect } from "react";
 import { loadGoogleMaps } from "@/lib/google-maps";
 
 export type AutocompletedAddress = {
@@ -51,8 +52,11 @@ export function AddressAutocomplete({
   const libRef = useRef<PlacesLib | null>(null);
   const tokenRef = useRef<object | null>(null);
   const boxRef = useRef<HTMLDivElement>(null);
+  // Latest onSelect for the async handlers below (updated after render, not during it).
   const onSelectRef = useRef(onSelect);
-  onSelectRef.current = onSelect;
+  useLayoutEffect(() => {
+    onSelectRef.current = onSelect;
+  });
 
   // Load the Places library once (best-effort — never blocks the manual fields).
   useEffect(() => {
@@ -168,22 +172,22 @@ export function AddressAutocomplete({
         onFocus={() => suggestions.length > 0 && setOpen(true)}
         onKeyDown={onKeyDown}
         placeholder="Start typing your address…"
-        className="field-brutal"
+        className={FIELD}
         autoComplete="off"
         role="combobox"
         aria-expanded={open}
         aria-autocomplete="list"
       />
       {open && suggestions.length > 0 && (
-        <ul className="absolute z-30 mt-1 max-h-64 w-full overflow-auto border-2 border-border bg-background shadow-[4px_4px_0_0_hsl(var(--primary))]">
+        <ul className="absolute z-30 mt-1 max-h-64 w-full overflow-auto border border-euro-line bg-white shadow-[0_12px_30px_rgba(5,9,48,0.08)]">
           {suggestions.map((s, i) => (
             <li key={i}>
               <button
                 type="button"
                 onMouseEnter={() => setActive(i)}
                 onClick={() => void choose(s)}
-                className={`block w-full px-3 py-2 text-left text-sm ${
-                  i === active ? "bg-primary text-primary-foreground" : "hover:bg-secondary"
+                className={`block w-full px-4 py-2.5 text-left text-[13.5px] text-euro-text ${
+                  i === active ? "bg-euro-tint" : "hover:bg-euro-tint"
                 }`}
               >
                 {s.placePrediction?.text.text}
@@ -193,7 +197,7 @@ export function AddressAutocomplete({
         </ul>
       )}
       {loading && (
-        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+        <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-euro-muted">
           …
         </span>
       )}

@@ -23,6 +23,7 @@ export default {
         // exposes them as CSS variables. Faro is the workhorse; Shorelines is script.
         sans: ["var(--font-jost)", "Futura", "system-ui", "sans-serif"],
         jost: ["var(--font-jost)", "Futura", "system-ui", "sans-serif"],
+        display: ["var(--font-cormorant)", "Georgia", "serif"],
         serif: ["var(--font-faro)", "Georgia", "serif"],
         faro: ["var(--font-faro)", "system-ui", "sans-serif"],
         shorelines: ["var(--font-shorelines)", "cursive"],

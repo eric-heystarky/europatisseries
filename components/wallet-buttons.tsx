@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useLayoutEffect } from "react";
 
 /**
  * Google Pay + Apple Pay buttons via the Square Web Payments SDK.
@@ -80,7 +80,9 @@ export function WalletButtons({ amountCents, currency, validate, onToken, onErro
 
   // Keep latest callbacks in refs so the effect only re-runs on amount/currency.
   const cb = useRef({ validate, onToken, onError });
-  cb.current = { validate, onToken, onError };
+  useLayoutEffect(() => {
+    cb.current = { validate, onToken, onError };
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -183,10 +185,10 @@ export function WalletButtons({ amountCents, currency, validate, onToken, onErro
       <div ref={gpayRef} className={googleReady ? "min-h-11 w-full" : "hidden"} aria-label="Pay with Google Pay" />
 
       {show && (
-        <div className="flex items-center gap-3 py-1 text-[11px] font-bold uppercase tracking-[0.15em] text-muted-foreground">
-          <span className="h-px flex-1 bg-border" />
+        <div className="flex items-center gap-3 py-1 text-[10.5px] font-medium uppercase tracking-[0.18em] text-euro-muted">
+          <span className="h-px flex-1 bg-euro-line" />
           or pay with card
-          <span className="h-px flex-1 bg-border" />
+          <span className="h-px flex-1 bg-euro-line" />
         </div>
       )}
     </div>
