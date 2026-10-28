@@ -21,12 +21,25 @@ export default {
       fontFamily: {
         // Brand faces are loaded via next/font/local in app/layout.tsx, which
         // exposes them as CSS variables. Faro is the workhorse; Shorelines is script.
-        sans: ["var(--font-faro)", "system-ui", "sans-serif"],
+        sans: ["var(--font-jost)", "Futura", "system-ui", "sans-serif"],
+        jost: ["var(--font-jost)", "Futura", "system-ui", "sans-serif"],
         serif: ["var(--font-faro)", "Georgia", "serif"],
         faro: ["var(--font-faro)", "system-ui", "sans-serif"],
         shorelines: ["var(--font-shorelines)", "cursive"],
       },
       colors: {
+        // Redesign palette (Euro navy + periwinkle), used by the new components.
+        euro: {
+          ink: "#050930",
+          text: "#1F2449",
+          soft: "#4A5079",
+          muted: "#5F6590",
+          accent: "#2E3570",
+          edge: "#6E76B3",
+          cream: "#E6E8F4",
+          tint: "#F1F2F9",
+          line: "#D3D7EA",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

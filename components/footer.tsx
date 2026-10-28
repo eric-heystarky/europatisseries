@@ -1,146 +1,138 @@
 "use client";
 
 import Link from "next/link";
-import { Bike, Store, MapPin, Lock, Instagram } from "lucide-react";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+import { Store, Truck, CakeSlice, Lock, Instagram } from "lucide-react";
+import { BUSINESS } from "@/lib/site";
 
-const LOGO =
-  "https://vibe.filesafe.space/1782359074813107391/attachments/7e2aeccd-b174-447b-90d6-578c90242df0.png";
+const LOGO = "/images/logo/euro-patisserie.svg";
+
+const PROMISES = [
+  { icon: Store, title: "Pickup", text: "Free from 974 High St, Armadale. Open 7 days, 7am – 3pm." },
+  { icon: Truck, title: "Delivery", text: "$5 per km from our shop. Free on orders over $150." },
+  { icon: CakeSlice, title: "Catering", text: "Ready-made platters from $100. Order 24 hours ahead." },
+  { icon: Lock, title: "Secure payment", text: "Payments processed securely by Square." },
+];
+
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className={className} aria-hidden="true">
+      <path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5" />
+      <path d="M14 3c.5 2.8 2.4 4.5 5 4.8" />
+    </svg>
+  );
+}
 
 export function Footer() {
   return (
-    <footer className="border-t-2 border-primary bg-background text-primary">
-      {/* Features Section — 2x2 on mobile, single row on large screens */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 border-b-2 border-primary">
-        <div className="flex flex-col items-center text-center p-6 md:p-12 border-r-2 border-b-2 lg:border-b-0 border-primary">
-          <Bike className="w-7 h-7 md:w-8 md:h-8 mb-4 md:mb-6" strokeWidth={1} />
-          <h4 className="font-bold tracking-widest uppercase mb-2 md:mb-4 text-xs md:text-sm">DELIVERY (D+1)</h4>
-          <p className="text-xs md:text-sm font-medium opacity-80">By courier</p>
-        </div>
-        <div className="flex flex-col items-center text-center p-6 md:p-12 border-b-2 lg:border-b-0 lg:border-r-2 border-primary">
-          <Store className="w-7 h-7 md:w-8 md:h-8 mb-4 md:mb-6" strokeWidth={1} />
-          <h4 className="font-bold tracking-widest uppercase mb-2 md:mb-4 text-xs md:text-sm">IN-STORE PURCHASE</h4>
-          <p className="text-xs md:text-sm font-medium opacity-80">Open 7 Days · 7AM - 3PM</p>
-        </div>
-        <div className="flex flex-col items-center text-center p-6 md:p-12 border-r-2 border-primary">
-          <MapPin className="w-7 h-7 md:w-8 md:h-8 mb-4 md:mb-6" strokeWidth={1} />
-          <h4 className="font-bold tracking-widest uppercase mb-2 md:mb-4 text-xs md:text-sm">CLICK & COLLECT</h4>
-          <p className="text-xs md:text-sm font-medium opacity-80">Order today before 8PM and collect tomorrow from 10AM</p>
-        </div>
-        <div className="flex flex-col items-center text-center p-6 md:p-12">
-          <Lock className="w-7 h-7 md:w-8 md:h-8 mb-4 md:mb-6" strokeWidth={1} />
-          <h4 className="font-bold tracking-widest uppercase mb-2 md:mb-4 text-xs md:text-sm">SECURE PAYMENT</h4>
-          <p className="text-xs md:text-sm font-medium opacity-80">Protected payments ensuring a secure experience.</p>
-        </div>
+    <footer className="bg-euro-cream text-euro-soft">
+      {/* What to expect — 2×2 on mobile, one row on large screens */}
+      <div className="grid grid-cols-2 border-y border-euro-line lg:grid-cols-4">
+        {PROMISES.map(({ icon: Icon, title, text }, i) => (
+          <div
+            key={title}
+            className={`flex flex-col items-center gap-3 px-4 py-8 text-center md:py-11 ${
+              i % 2 === 0 ? "border-r border-euro-line" : ""
+            } ${i < 2 ? "border-b border-euro-line lg:border-b-0" : ""} ${i === 1 ? "lg:border-r" : ""}`}
+          >
+            <Icon className="h-6 w-6 text-euro-ink" strokeWidth={1.2} aria-hidden="true" />
+            <h2 className="euro-label text-[11px] text-euro-ink md:text-[12.5px]">{title}</h2>
+            <p className="max-w-[240px] text-[12.5px] leading-relaxed md:text-[13.5px]">{text}</p>
+          </div>
+        ))}
       </div>
 
-      {/* Main Footer Content */}
-      <div className="container mx-auto px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
-          {/* Addresses */}
-          <div>
-            <h4 className="font-bold uppercase tracking-widest mb-8 text-sm">OUR LOCATIONS</h4>
-            <div className="flex flex-col gap-4 text-sm font-medium opacity-80">
-              <Link href="/contact" className="hover:opacity-100 transition-opacity">
-                Armadale
-              </Link>
-              <a
-                href="https://maps.google.com/?q=Euro+Patisserie+Armadale"
-                target="_blank"
-                rel="noreferrer"
-                className="mt-2 text-xs font-bold underline underline-offset-4 hover:opacity-70 transition-opacity"
-              >
-                VIEW ON MAP
-              </a>
-            </div>
-          </div>
-
-          {/* About */}
-          <div>
-            <h4 className="font-bold uppercase tracking-widest mb-8 text-sm">ABOUT</h4>
-
-            <div className="mb-8">
-              <h5 className="font-bold uppercase tracking-widest mb-4 text-xs">JOIN US</h5>
-              <p className="text-sm font-medium opacity-80 mb-2">Want to join our team? Apply on</p>
-              <Link
-                href="/join-team"
-                className="text-sm font-medium underline underline-offset-4 hover:opacity-70 transition-opacity"
-              >
-                careers@europatisserie.com.au
-              </Link>
-            </div>
-
-            <div>
-              <h5 className="font-bold uppercase tracking-widest mb-4 text-xs">FOLLOW US</h5>
-              <div className="flex gap-4">
-                <a
-                  href="https://www.instagram.com/europatisseriearmadale/?hl=en"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary hover:opacity-70 transition-opacity"
-                >
-                  <Instagram className="w-5 h-5" />
-                </a>
-                <a
-                  href="https://www.tiktok.com/@europatisseriearmadale"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary hover:opacity-70 transition-opacity"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.12-3.44-3.17-3.64-5.46-.22-2.39.87-4.78 2.87-6.09 1.63-1.08 3.67-1.35 5.51-.83v4.09c-.43-.1-.88-.13-1.32-.12-.76.02-1.5.38-2.04.93-.52.54-.83 1.25-.87 1.99-.05.8.21 1.59.73 2.19.51.6 1.25.96 2.03 1.01.76.05 1.53-.18 2.14-.61.6-.43 1.01-1.07 1.15-1.8.04-.2.06-.41.06-.61V0h4.08z" />
-                  </svg>
-                </a>
-              </div>
-            </div>
-          </div>
-
-          {/* Newsletter */}
-          <div>
-            <h4 className="font-bold uppercase tracking-widest mb-8 text-sm">NEWSLETTER</h4>
-            <p className="text-sm font-medium opacity-80 mb-6 leading-relaxed">
-              Subscribe to the Euro Patisserie newsletter and receive immediately an exclusive -10% promo code*
-            </p>
-
-            <form className="flex gap-4 mb-6" onSubmit={(e) => e.preventDefault()}>
-              <Input
-                type="email"
-                placeholder="E-mail"
-                className="rounded-none border-2 border-primary bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-primary/50"
-              />
-              <Button
-                type="submit"
-                className="rounded-none border-2 border-primary bg-primary text-primary-foreground hover:bg-transparent hover:text-primary px-8 font-bold tracking-widest uppercase text-xs"
-              >
-                SUBSCRIBE
-              </Button>
-            </form>
-
-            <p className="text-xs font-bold mb-2">*from $59 of purchase excluding delivery</p>
-            <p className="text-xs font-medium opacity-60 leading-relaxed">
-              By clicking on subscribe, I wish to subscribe to the newsletter and receive by email the latest
-              creations, promotions and news of Euro Patisserie and I accept the Privacy Policy and acknowledge I can
-              unsubscribe at any time.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-col items-center justify-center pb-16 gap-6">
-        <img src={LOGO} alt="Euro Patisserie" className="h-16 object-contain opacity-50" />
-        <p className="text-xs font-medium opacity-60 uppercase tracking-widest">
-          Powered by{" "}
+      <div className="mx-auto flex max-w-[1200px] flex-wrap gap-x-16 gap-y-12 px-6 pb-10 pt-16 md:px-12 md:pt-20">
+        <div className="flex min-w-[200px] flex-1 flex-col gap-3">
+          <h2 className="euro-label text-euro-ink">Our location</h2>
+          <p className="mt-2 text-[11px] font-medium uppercase tracking-[0.1em] text-euro-ink">Armadale</p>
+          <p className="text-sm leading-7">
+            {BUSINESS.streetAddress}, {BUSINESS.locality} {BUSINESS.region} {BUSINESS.postalCode}
+            <br />
+            Open 7 days, 7am – 3pm
+            <br />
+            <a href={`tel:${BUSINESS.phone.replace(/\s/g, "")}`} className="hover:text-euro-ink">
+              (03) 9822 1234
+            </a>
+            <br />
+            <a href={`mailto:${BUSINESS.email}`} className="hover:text-euro-ink">
+              {BUSINESS.email}
+            </a>
+          </p>
           <a
-            href="https://heystarky.com.au"
+            href="https://maps.google.com/?q=Euro+Patisserie+Armadale"
             target="_blank"
             rel="noreferrer"
-            className="underline underline-offset-4 hover:opacity-100 transition-opacity"
+            className="mt-1 text-[11px] font-medium uppercase tracking-[0.14em] text-euro-ink underline underline-offset-4"
           >
-            HeyStarky AU
+            View on map
           </a>
-        </p>
+        </div>
+
+        <div className="flex min-w-[200px] flex-1 flex-col gap-3">
+          <h2 className="euro-label text-euro-ink">About</h2>
+          <nav aria-label="About" className="mt-2 flex flex-col gap-2.5 text-sm">
+            <Link href="/about" className="hover:text-euro-ink">Our story</Link>
+            <Link href="/cafe" className="hover:text-euro-ink">The café</Link>
+            <Link href="/gift-cards" className="hover:text-euro-ink">Gift cards</Link>
+            <Link href="/join-team" className="hover:text-euro-ink">Join the team</Link>
+            <Link href="/pre-order#faq" className="hover:text-euro-ink">FAQ</Link>
+            <Link href="/contact" className="hover:text-euro-ink">Contact</Link>
+          </nav>
+        </div>
+
+        <div className="flex min-w-[280px] flex-[1.4] flex-col gap-3">
+          <h2 className="euro-label text-euro-ink">Newsletter</h2>
+          <p className="mt-2 text-sm leading-7">
+            Subscribe to the Euro Patisserie newsletter and receive an exclusive 10% promo code.*
+          </p>
+          <form className="flex flex-wrap gap-3" onSubmit={(e) => e.preventDefault()}>
+            <label className="flex min-w-[200px] flex-1">
+              <span className="sr-only">Email address</span>
+              <input
+                type="email"
+                placeholder="E-mail"
+                className="h-[46px] w-full border border-euro-line bg-white px-4 text-base text-euro-text outline-none focus:border-euro-ink"
+              />
+            </label>
+            <button type="submit" className="btn-euro">
+              Subscribe
+            </button>
+          </form>
+          <p className="text-xs leading-relaxed">
+            *From $59 of purchase, excluding delivery. By subscribing you agree to receive emails from Euro
+            Patisserie and accept our Privacy Policy. You can unsubscribe at any time.
+          </p>
+        </div>
       </div>
+
+      <div className="flex flex-col items-center gap-5 px-6 pt-4">
+        <img src={LOGO} alt="Euro Patisserie" className="h-14 object-contain" />
+        <div className="flex gap-5 text-euro-ink">
+          <a aria-label="Instagram" href={BUSINESS.instagram} target="_blank" rel="noreferrer" className="hover:opacity-70">
+            <Instagram className="h-5 w-5" strokeWidth={1.5} />
+          </a>
+          <a aria-label="TikTok" href={BUSINESS.tiktok} target="_blank" rel="noreferrer" className="hover:opacity-70">
+            <TikTokIcon className="h-5 w-5" />
+          </a>
+        </div>
+      </div>
+
+      <nav
+        aria-label="Legal"
+        className="mx-auto mt-8 flex flex-wrap justify-center gap-x-10 gap-y-2 border-b border-euro-line px-6 pb-6 text-[13px]"
+      >
+        <Link href="/contact" className="hover:text-euro-ink">Contact us</Link>
+        <Link href="/catering" className="hover:text-euro-ink">Catering</Link>
+        <Link href="/gift-cards" className="hover:text-euro-ink">Gift cards</Link>
+        <Link href="/pre-order#faq" className="hover:text-euro-ink">FAQ</Link>
+      </nav>
+      {/* Extra bottom room on mobile so the floating chat/back-to-top buttons don't cover it */}
+      <p className="px-6 pb-28 pt-6 text-center text-[12.5px] md:pb-6">
+        © {new Date().getFullYear()} Euro Patisserie Armadale · Powered by{" "}
+        <a href="https://heystarky.com.au" target="_blank" rel="noreferrer" className="underline underline-offset-4 hover:text-euro-ink">
+          HeyStarky
+        </a>
+      </p>
     </footer>
   );
 }

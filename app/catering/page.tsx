@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getCachedMenu } from "@/lib/menu";
+import { getMenuOrSample } from "@/lib/menu-source";
 import CateringView from "./catering-view";
 import { FaqSection } from "@/components/faq-section";
 
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  const menu = await getCachedMenu();
+  const { menu } = await getMenuOrSample();
   return (
     <>
       <CateringView menu={menu} />

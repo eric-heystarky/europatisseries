@@ -24,6 +24,8 @@ export type CartLine = {
   quantity: number;
   /** Product image for the cart/checkout thumbnail. */
   imageUrl?: string;
+  /** Sold out on the first available day — the bag blocks checkout for that day. */
+  soldOutToday?: boolean;
 };
 
 /** A line ready to add — quantity and key are derived by the reducer. */

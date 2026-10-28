@@ -1,0 +1,27 @@
+# PREVIEW app for the redesign (revamp/new-design) — NOT the live site.
+# Live is the separate Fly app "europatisseries" (patisseries.com.au), deployed from config outside this repo.
+# Deploy:  fly deploy --config fly.preview.toml
+app = "europatisseries-preview"
+primary_region = "syd"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[build.args]
+  NEXT_PUBLIC_SITE_URL = "https://europatisseries-preview.fly.dev"
+  NOINDEX = "1"
+
+[env]
+  NOINDEX = "1"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1

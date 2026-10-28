@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { Navbar } from "./navbar";
 import { Footer } from "./footer";
 import { FloatingWidgets } from "./floating-widgets";
+import { MobileOrderBar } from "./mobile-order-bar";
 import { LoadingScreen } from "./LoadingScreen";
 
 /**
@@ -18,10 +19,13 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
     <>
       <LoadingScreen />
       <Navbar />
-      <main className={`flex-1 ${isHomePage ? "pt-[32px] md:pt-[40px]" : "pt-[102px] md:pt-[120px]"}`}>
+      {/* Home: the header floats over the hero, so only clear the announcement line.
+          Other pages: clear the announcement line + the solid header bar. */}
+      <main className={`flex-1 ${isHomePage ? "pt-9" : "pt-[96px] md:pt-[104px]"}`}>
         {children}
       </main>
       <FloatingWidgets />
+      <MobileOrderBar />
       <Footer />
     </>
   );

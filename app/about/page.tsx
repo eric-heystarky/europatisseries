@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AnimatedSection } from "@/components/AnimatedSection";
-import { Testimonials } from "@/components/testimonials";
 import { FaqSection } from "@/components/faq-section";
+import { Reviews } from "@/components/home/social";
+import { getGoogleReviews } from "@/lib/google-reviews";
+import { BTN_ON_PHOTO, BTN_ON_PHOTO_OUTLINE, PhotoHero, Points, Split } from "@/components/split";
 
 export const metadata: Metadata = {
   title: "Our Story & Craft — A European Bakery in Armadale",
@@ -19,6 +21,7 @@ const CROISSANTS = "https://vibe.filesafe.space/1782359074813107391/attachments/
 const CRAFT_CROISSANT = "/images/hero/croissant.jpg";
 const CRAFT_ECLAIRS = "/images/hero/eclairs.jpg";
 const CRAFT_CRUMB = "/images/featured/croissant-close.jpg";
+const CRAFT_FLATLAY = "/images/catering/croissant-flatlay.jpg";
 
 const BUTTER_POINTS = [
   "Better lamination and consistency",
@@ -51,222 +54,163 @@ const VALUES = [
   { title: "Proudly Armadale", body: "A neighbourhood patisserie on High Street, here for your morning coffee and your big celebrations alike." },
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const reviews = await getGoogleReviews();
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Hero */}
-      <section className="border-b-2 border-primary bg-primary px-5 py-24 text-center text-primary-foreground">
-        <p className="text-xs uppercase tracking-[0.35em] text-primary-foreground/60">Euro Patisserie · Armadale</p>
-        <h1 className="mt-2 font-shorelines text-7xl leading-none md:text-9xl">Our Story</h1>
-      </section>
+    <div className="bg-white">
+      <PhotoHero img={CROISSANTS} alt="Freshly baked croissants" eyebrow="Euro Patisserie · Armadale" title="Our Story" />
 
       {/* Intro */}
-      <AnimatedSection className="mx-auto max-w-3xl px-5 py-20 text-center">
-        <p className="text-xl font-light leading-relaxed md:text-2xl">
+      <AnimatedSection className="mx-auto max-w-[760px] px-6 py-20 text-center md:py-28">
+        <p className="text-[clamp(18px,1.7vw,22px)] font-light leading-[1.7] text-euro-text">
           Euro Patisserie is a European bakery in the heart of Armadale, where French technique meets a warm
-          neighbourhood welcome. From the first batch of croissants before sunrise to the last slice of cake in
-          the afternoon, everything is made by hand, in-house, every single day.
+          neighbourhood welcome. From the first batch of croissants before sunrise to the last slice of cake in the
+          afternoon, everything is made by hand, in-house, every single day.
         </p>
       </AnimatedSection>
 
-      {/* Split — craft */}
-      <section className="flex flex-col border-y-2 border-primary md:flex-row">
-        <div className="w-full md:w-1/2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={CROISSANTS} alt="Freshly baked croissants" className="h-full w-full object-cover md:min-h-[60vh]" />
-        </div>
-        <AnimatedSection className="flex w-full flex-col justify-center border-t-2 border-primary p-8 md:w-1/2 md:border-l-2 md:border-t-0 md:p-16">
-          <p className="text-sm font-faro uppercase tracking-widest text-primary/70">The Craft</p>
-          <h2 className="mt-3 font-serif text-4xl font-light uppercase leading-tight md:text-5xl">
-            Butter, time &amp; technique
-          </h2>
-          <p className="mt-6 text-base leading-relaxed text-muted-foreground md:text-lg">
-            Great pastry can&apos;t be rushed. We laminate our doughs the traditional way, whip our own creams and
-            ganaches, and finish every cake by hand. It&apos;s slower — but you can taste the difference in every
-            flaky, buttery bite.
+      <Split img={CRAFT_FLATLAY} alt="Croissants laid out on the bench" eyebrow="The craft" title="Butter, time & technique" tint>
+        <p>
+          Great pastry can&apos;t be rushed. We laminate our doughs the traditional way, whip our own creams and
+          ganaches, and finish every cake by hand. It&apos;s slower — but you can taste the difference in every flaky,
+          buttery bite.
+        </p>
+      </Split>
+
+      {/* Our Craft */}
+      <section className="px-6 py-20 text-center md:py-28">
+        <AnimatedSection className="mx-auto flex max-w-[760px] flex-col items-center gap-5">
+          <p className="euro-eyebrow text-euro-muted">Our craft</p>
+          <h2 className="euro-heading text-[clamp(26px,2.8vw,40px)] text-euro-ink">Australian flour, French ingredients</h2>
+          <p className="text-[15px] leading-[1.8] text-euro-soft">
+            We never stop improving. By pairing premium Australian wheat with world-class French butter and chocolate —
+            and traditional French technique — every pastry is uniquely Euro Patisserie.
           </p>
         </AnimatedSection>
       </section>
 
-      {/* ───────── Our Craft ───────── */}
-      <section className="border-b-2 border-primary bg-primary px-5 py-16 text-center text-primary-foreground md:py-20">
-        <AnimatedSection className="mx-auto max-w-4xl">
-          <p className="text-xs uppercase tracking-[0.35em] text-primary-foreground/60">Our Craft</p>
-          <h2 className="mx-auto mt-4 max-w-3xl font-serif text-3xl font-light uppercase leading-tight md:text-5xl">
-            Australian flour, French ingredients
-          </h2>
-          <p className="mx-auto mt-6 max-w-2xl text-base font-light text-primary-foreground/80 md:text-lg">
-            We never stop improving. By pairing premium Australian wheat with world-class French butter and
-            chocolate — and traditional French technique — every pastry is uniquely Euro Patisserie.
-          </p>
-        </AnimatedSection>
-      </section>
+      <Split img={CRAFT_CROISSANT} alt="Golden butter croissants" eyebrow="The butter · France" title="Lescure 84% AOP">
+        <p>
+          Crafted in France since 1884 and trusted by many of the world&apos;s leading pâtisseries, Lescure&apos;s AOP
+          certification guarantees authentic French origin and traditional methods. At 84% butterfat — less water, more
+          pure butter — it&apos;s in every Croissant and Pain au Chocolat we make.
+        </p>
+        <Points items={BUTTER_POINTS} />
+      </Split>
 
-      {/* 🧈 Butter */}
-      <section className="flex flex-col border-b-2 border-primary md:flex-row">
-        <div className="w-full md:w-1/2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={CRAFT_CROISSANT} alt="Golden butter croissants" className="h-full w-full object-cover md:min-h-[60vh]" />
-        </div>
-        <AnimatedSection className="flex w-full flex-col justify-center border-t-2 border-primary p-8 md:w-1/2 md:border-l-2 md:border-t-0 md:p-16">
-          <p className="text-sm font-faro uppercase tracking-widest text-primary/70">🧈 The Butter</p>
-          <h2 className="mt-3 font-serif text-4xl font-light uppercase leading-tight md:text-5xl">
-            Lescure 84% AOP
-          </h2>
-          <p className="mt-6 font-light text-muted-foreground">
-            Crafted in France since 1884 and trusted by many of the world&apos;s leading pâtisseries, Lescure&apos;s
-            AOP certification guarantees authentic French origin and traditional methods. At 84% butterfat — less
-            water, more pure butter — it&apos;s in every Croissant and Pain au Chocolat we make.
-          </p>
-          <ul className="mt-6 space-y-2">
-            {BUTTER_POINTS.map((p) => (
-              <li key={p} className="flex items-start gap-3 text-sm">
-                <span className="mt-2 h-1.5 w-1.5 flex-none bg-primary" />
-                {p}
-              </li>
-            ))}
-          </ul>
-        </AnimatedSection>
-      </section>
+      <Split img={CRAFT_ECLAIRS} alt="Glossy chocolate pastries" eyebrow="The chocolate · France" title="Valrhona" flip>
+        <p>
+          One of the world&apos;s most respected chocolate makers, trusted by leading pastry chefs for over 100 years. As a
+          certified B Corporation, Valrhona is recognised for ethical sourcing, sustainability and supporting
+          cocoa-growing communities.
+        </p>
+        <p>
+          We&apos;ve upgraded to Valrhona chocolate batons from France — so every Pain au Chocolat delivers an even richer,
+          more luxurious chocolate experience.
+        </p>
+      </Split>
 
-      {/* 🍫 Chocolate */}
-      <section className="flex flex-col border-b-2 border-primary md:flex-row-reverse">
-        <div className="w-full md:w-1/2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={CRAFT_ECLAIRS} alt="Glossy chocolate pastries" className="h-full w-full object-cover md:min-h-[60vh]" />
-        </div>
-        <AnimatedSection className="flex w-full flex-col justify-center border-t-2 border-primary p-8 md:w-1/2 md:border-r-2 md:border-t-0 md:p-16">
-          <p className="text-sm font-faro uppercase tracking-widest text-primary/70">🍫 The Chocolate</p>
-          <h2 className="mt-3 font-serif text-4xl font-light uppercase leading-tight md:text-5xl">
-            Valrhona, France
-          </h2>
-          <p className="mt-6 font-light text-muted-foreground">
-            One of the world&apos;s most respected chocolate makers, trusted by leading pastry chefs for over 100
-            years. As a certified B Corporation, Valrhona is recognised for ethical sourcing, sustainability and
-            supporting cocoa-growing communities.
-          </p>
-          <p className="mt-4 font-light text-muted-foreground">
-            We&apos;ve upgraded to Valrhona chocolate batons from France — so every Pain au Chocolat delivers an
-            even richer, more luxurious chocolate experience.
-          </p>
-        </AnimatedSection>
-      </section>
-
-      {/* 🌾 Flour */}
-      <section className="flex flex-col border-b-2 border-primary md:flex-row">
-        <div className="w-full md:w-1/2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={CRAFT_CRUMB} alt="The open honeycomb crumb of a croissant" className="h-full w-full object-cover md:min-h-[60vh]" />
-        </div>
-        <AnimatedSection className="flex w-full flex-col justify-center border-t-2 border-primary p-8 md:w-1/2 md:border-l-2 md:border-t-0 md:p-16">
-          <p className="text-sm font-faro uppercase tracking-widest text-primary/70">🌾 The Flour</p>
-          <h2 className="mt-3 font-serif text-4xl font-light uppercase leading-tight md:text-5xl">
-            Laucke Euro T55
-          </h2>
-          <p className="mt-6 font-light text-muted-foreground">
-            Exceptional pastries begin with exceptional flour. Milled in Australia from premium Australian wheat,
-            Laucke Euro T55 is developed for authentic European viennoiserie. &ldquo;T55&rdquo; is the traditional
-            French classification used throughout France for classic pastries — the ideal balance of strength,
-            extensibility and texture. Laucke has been milling with Australian growers for over 125 years.
-          </p>
-          <ul className="mt-6 space-y-2">
-            {FLOUR_POINTS.map((p) => (
-              <li key={p} className="flex items-start gap-3 text-sm">
-                <span className="mt-2 h-1.5 w-1.5 flex-none bg-primary" />
-                {p}
-              </li>
-            ))}
-          </ul>
-        </AnimatedSection>
-      </section>
+      <Split img={CRAFT_CRUMB} alt="The open honeycomb crumb of a croissant" eyebrow="The flour · Australia" title="Laucke Euro T55">
+        <p>
+          Exceptional pastries begin with exceptional flour. Milled in Australia from premium Australian wheat, Laucke Euro
+          T55 is developed for authentic European viennoiserie. &ldquo;T55&rdquo; is the traditional French classification
+          used throughout France for classic pastries — the ideal balance of strength, extensibility and texture. Laucke
+          has been milling with Australian growers for over 125 years.
+        </p>
+        <Points items={FLOUR_POINTS} />
+      </Split>
 
       {/* The three-day journey */}
-      <section className="border-b-2 border-primary bg-secondary px-5 py-20 md:px-8 md:py-28">
-        <div className="mx-auto max-w-5xl">
-          <AnimatedSection className="text-center">
-            <p className="text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground">Every Croissant</p>
-            <h2 className="mt-3 font-shorelines text-5xl leading-none md:text-7xl">a three-day journey</h2>
-            <p className="mx-auto mt-6 max-w-2xl font-light text-muted-foreground">
-              What many customers don&apos;t see is the patience behind every pastry. Slow fermentation develops
-              deeper flavour, strengthens the dough, and creates the light honeycomb crumb that defines an
-              exceptional croissant.
+      <section className="bg-euro-tint px-6 py-20 md:px-12 md:py-28">
+        <div className="mx-auto max-w-[1180px]">
+          <AnimatedSection className="mx-auto flex max-w-[680px] flex-col items-center gap-5 text-center">
+            <p className="euro-eyebrow text-euro-muted">Every croissant</p>
+            <h2 className="euro-heading text-[clamp(26px,2.8vw,40px)] text-euro-ink">A three-day journey</h2>
+            <p className="text-[15px] leading-[1.8] text-euro-soft">
+              What many customers don&apos;t see is the patience behind every pastry. Slow fermentation develops deeper
+              flavour, strengthens the dough, and creates the light honeycomb crumb that defines an exceptional croissant.
             </p>
           </AnimatedSection>
-          <div className="mt-12 grid gap-px border-2 border-primary bg-primary sm:grid-cols-2 lg:grid-cols-3">
+          <ol className="mt-14 grid border-t border-euro-line sm:grid-cols-2 lg:grid-cols-3">
             {JOURNEY.map((s) => (
-              <div key={s.n} className="bg-background p-6 md:p-8">
-                <p className="font-serif text-2xl font-light text-muted-foreground">{s.n}</p>
-                <h3 className="mt-2 font-bold uppercase tracking-wide">{s.t}</h3>
-                <p className="mt-1 text-sm font-light text-muted-foreground">{s.d}</p>
-              </div>
+              <li key={s.n} className="flex flex-col gap-2 border-b border-euro-line py-8 sm:pr-10">
+                <span className="text-[28px] font-extralight leading-none text-euro-muted">{s.n}</span>
+                <span className="euro-label mt-2 text-euro-ink">{s.t}</span>
+                <span className="text-[14px] leading-[1.7] text-euro-soft">{s.d}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* Values */}
+      <section className="px-6 py-20 md:px-12 md:py-28">
+        <div className="mx-auto max-w-[1180px]">
+          <AnimatedSection className="flex flex-col items-center gap-5 text-center">
+            <p className="euro-eyebrow text-euro-muted">Our promise</p>
+            <h2 className="euro-heading text-[clamp(26px,2.8vw,40px)] text-euro-ink">What we stand for</h2>
+          </AnimatedSection>
+          <div className="mt-14 grid gap-10 md:grid-cols-3 md:gap-12">
+            {VALUES.map((v, i) => (
+              <AnimatedSection key={v.title} delay={i * 0.1} className="flex flex-col gap-3 border-t border-euro-ink pt-6">
+                <span className="text-[11px] font-medium tracking-[0.2em] text-euro-muted">0{i + 1}</span>
+                <h3 className="euro-label text-euro-ink">{v.title}</h3>
+                <p className="text-[14px] leading-[1.75] text-euro-soft">{v.body}</p>
+              </AnimatedSection>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Values */}
-      <section className="mx-auto max-w-6xl px-5 py-20">
-        <AnimatedSection>
-          <h2 className="border-b-2 border-border pb-3 font-serif text-3xl font-semibold uppercase tracking-wide md:text-4xl">
-            What we stand for
-          </h2>
-        </AnimatedSection>
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
-          {VALUES.map((v, i) => (
-            <AnimatedSection key={v.title} delay={i * 0.1} className="border-2 border-border bg-card p-7">
-              <span className="font-serif text-5xl font-bold text-primary/15">0{i + 1}</span>
-              <h3 className="mt-3 font-serif text-xl font-semibold uppercase tracking-wide">{v.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{v.body}</p>
-            </AnimatedSection>
-          ))}
+      {/* Kind words — the real Google reviews */}
+      <section className="bg-euro-tint px-6 py-20 md:px-12 md:py-24">
+        <div className="mx-auto grid max-w-[1180px] items-center gap-12 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-20">
+          <AnimatedSection className="flex flex-col gap-5">
+            <p className="euro-eyebrow text-euro-muted">Loved locally</p>
+            <h2 className="euro-heading text-[clamp(26px,2.8vw,40px)] text-euro-ink">Kind words</h2>
+            <p className="max-w-[400px] text-[15px] leading-[1.8] text-euro-soft">
+              A few words from our regulars, straight from Google.
+            </p>
+          </AnimatedSection>
+          <Reviews data={reviews} />
         </div>
       </section>
 
-      {/* Testimonials */}
-      <Testimonials />
-
-      {/* Image breaker + CTA */}
-      <section className="relative flex h-[60vh] items-center justify-center overflow-hidden border-y-2 border-primary">
+      {/* Come say hello */}
+      <section className="relative flex h-[560px] flex-col items-center justify-center overflow-hidden text-center text-white">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={SHOP} alt="Inside Euro Patisserie Armadale" className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-primary/50" />
-        <AnimatedSection className="relative z-10 px-5 text-center text-primary-foreground">
-          <h2 className="font-shorelines text-5xl leading-none md:text-7xl">Come say hello</h2>
-          <p className="mt-4 text-sm uppercase tracking-[0.2em] text-primary-foreground/80">
-            974 High St, Armadale · Open 7 days 7am–3pm
-          </p>
-          <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/pre-order" className="btn-brutal px-7 py-3 text-sm">Order Online</Link>
+        <img src={SHOP} alt="Inside Euro Patisserie Armadale" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+        <div aria-hidden="true" className="absolute inset-0 bg-[rgba(5,9,48,0.42)]" />
+        <AnimatedSection className="relative flex flex-col items-center gap-5 px-6">
+          <h2 className="euro-heading mr-[-0.16em] text-[clamp(28px,3.2vw,44px)] tracking-[0.16em]">Come say hello</h2>
+          <p className="euro-eyebrow">974 High St, Armadale · Open 7 days, 7am – 3pm</p>
+          <div className="mt-3 flex flex-col items-center gap-3 sm:flex-row">
+            <Link
+              href="/pre-order"
+              className={BTN_ON_PHOTO}
+            >
+              Order online
+            </Link>
             <Link
               href="/contact"
-              className="border-2 border-primary-foreground px-7 py-3 text-sm font-bold uppercase tracking-[0.12em] transition hover:bg-primary-foreground hover:text-primary"
+              className={BTN_ON_PHOTO_OUTLINE}
             >
-              Visit Us
+              Visit us
             </Link>
           </div>
         </AnimatedSection>
       </section>
 
-      {/* Cake teaser */}
-      <section className="flex flex-col border-b-2 border-primary md:flex-row-reverse">
-        <div className="w-full md:w-1/2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={CAKE} alt="Custom celebration cake" className="h-full w-full object-cover md:min-h-[55vh]" />
-        </div>
-        <AnimatedSection className="flex w-full flex-col justify-center border-t-2 border-primary p-8 md:w-1/2 md:border-r-2 md:border-t-0 md:p-16">
-          <p className="text-sm font-faro uppercase tracking-widest text-primary/70">Celebrations</p>
-          <h2 className="mt-3 font-serif text-4xl font-light uppercase leading-tight md:text-5xl">
-            For your big moments
-          </h2>
-          <p className="mt-6 text-base leading-relaxed text-muted-foreground md:text-lg">
-            Birthdays, weddings, office shouts — our custom cakes and catering platters turn any occasion into
-            something special. Tell us what you&apos;re celebrating and we&apos;ll make it.
-          </p>
-          <Link href="/catering" className="btn-brutal-outline mt-7 w-fit px-6 py-3 text-xs">
-            Explore Catering &amp; Events
-          </Link>
-        </AnimatedSection>
-      </section>
+      <Split img={CAKE} alt="Custom celebration cake" eyebrow="Celebrations" title="For your big moments" flip>
+        <p>
+          Birthdays, weddings, office shouts — our custom cakes and catering platters turn any occasion into something
+          special. Tell us what you&apos;re celebrating and we&apos;ll make it.
+        </p>
+        <Link href="/catering" className="btn-euro-outline mt-2 self-start text-euro-ink hover:bg-euro-ink hover:text-white">
+          Explore catering &amp; events
+        </Link>
+      </Split>
 
       <FaqSection />
     </div>

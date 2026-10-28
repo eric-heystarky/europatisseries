@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { getCachedMenu } from "@/lib/menu";
-import { MenuClient } from "@/components/menu-client";
+import { getMenuOrSample } from "@/lib/menu-source";
+import { buildShop } from "@/lib/shop";
+import { ShopSection } from "@/components/home/shop";
 import { FaqSection } from "@/components/faq-section";
 
 // Live menu — render at request time (cached 5 min via getCachedMenu), never prerendered at build.
@@ -13,8 +14,14 @@ export const metadata: Metadata = {
   alternates: { canonical: "/pre-order" },
 };
 
-export default async function PreOrderPage() {
-  const menu = await getCachedMenu();
+/** The full menu — every item, by category. The homepage shows a short preview of each. */
+export default async function PreOrderPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const [{ menu, source }, { tab }] = await Promise.all([getMenuOrSample(), searchParams]);
+  const shop = buildShop(menu, source);
 
   // ItemList of Products for richer search results.
   const itemListSchema = {
@@ -50,7 +57,9 @@ export default async function PreOrderPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
       />
-      <MenuClient menu={menu} />
+      <div className="bg-white">
+        <ShopSection shop={shop} variant="full" initialTab={typeof tab === "string" ? tab : undefined} />
+      </div>
       <FaqSection />
     </>
   );

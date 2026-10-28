@@ -3,19 +3,50 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { useScroll, useMotionValueEvent } from "framer-motion";
 import { Instagram, Search, ShoppingBag } from "lucide-react";
-import { Button } from "./ui/button";
 import { Sheet, SheetClose, SheetContent, SheetTrigger, SheetTitle } from "./ui/sheet";
-import { ThemeToggle } from "./ThemeToggle";
 import { useCart } from "./cart-context";
 
-const LOGO =
-  "https://vibe.filesafe.space/1782359074813107391/attachments/7e2aeccd-b174-447b-90d6-578c90242df0.png";
+const LOGO = "/images/logo/euro-patisserie.svg";
 
 const DOG_IMG =
   "https://vibe.filesafe.space/1782359074813107391/attachments/17124f1b-7f7c-4903-94c7-7d24968b1d60.png";
 
+const INSTAGRAM = "https://www.instagram.com/europatisseriearmadale/?hl=en";
+const TIKTOK = "https://www.tiktok.com/@europatisseriearmadale";
+
+const LEFT_LINKS = [
+  { name: "Menu", path: "/pre-order" },
+  { name: "Catering", path: "/catering" },
+  { name: "Gift Cards", path: "/gift-cards" },
+];
+
+const DRAWER_LINKS = [
+  { name: "Menu", path: "/pre-order" },
+  { name: "Catering & Events", path: "/catering" },
+  { name: "The Café", path: "/cafe" },
+  { name: "Gift Cards", path: "/gift-cards" },
+  { name: "Our Story", path: "/about" },
+  { name: "Join the Team", path: "/join-team" },
+  { name: "FAQ", path: "/pre-order#faq" },
+  { name: "Contact", path: "/contact" },
+];
+
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4} className={className} aria-hidden="true">
+      <path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5" />
+      <path d="M14 3c.5 2.8 2.4 4.5 5 4.8" />
+    </svg>
+  );
+}
+
+/**
+ * Site header. On the homepage it sits transparent over the hero photo; once the
+ * visitor scrolls (or on any other page) it becomes a slim, solid sticky bar so the
+ * menu, logo and bag are always one tap away.
+ */
 export function Navbar() {
   const pathname = usePathname();
   const { scrollY } = useScroll();
@@ -24,220 +55,181 @@ export function Navbar() {
   const isHomePage = pathname === "/";
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    setIsScrolled(latest > 50);
+    setIsScrolled(latest > 60);
   });
 
-  const primaryNavLinks = [
-    { name: "MENU", path: "/pre-order" },
-    { name: "CAFÉ", path: "/cafe" },
-    { name: "CATERING & EVENTS", path: "/catering" },
-    { name: "GIFT CARDS", path: "/gift-cards" },
-    { name: "ABOUT", path: "/about" },
-    { name: "JOIN THE TEAM", path: "/join-team" },
-    { name: "CONTACT", path: "/contact" },
-  ];
+  const overHero = isHomePage && !isScrolled;
+  const tone = overHero ? "text-white" : "text-euro-ink";
 
   return (
-    <header className="fixed top-0 w-full z-50 flex flex-col">
-      {/* Top Marquee */}
-      <div className="bg-primary text-primary-foreground flex items-center overflow-hidden border-primary-foreground/20 border-b-2">
-        <div className="h-8 md:h-10 flex items-center whitespace-nowrap animate-marquee font-bold text-xs md:text-sm tracking-widest uppercase">
-          {Array.from({ length: 7 }).map((_, i) => (
-            <span key={i} className="flex shrink-0">
-              <span className="mx-4">★ ORDER NOW ONLINE</span>
-              <span className="mx-4">★ OPEN 7 DAYS 7AM-3PM</span>
-            </span>
-          ))}
-        </div>
-      </div>
+    <header className="fixed top-0 z-50 w-full">
+      {/* Announcement — pinned above the header as you scroll; the clearest way in to ordering.
+          Phones: two short lines (ordering, then store details) in the same 36px height. */}
+      <Link
+        href="/pre-order"
+        className="group flex h-9 items-center justify-center gap-2 bg-euro-cream px-4 text-center font-medium uppercase text-euro-ink transition-colors hover:bg-euro-line"
+      >
+        <span className="flex flex-col text-[9.5px] leading-[1.35] tracking-[0.1em] md:block md:text-[11px] md:leading-normal md:tracking-[0.14em]">
+          <span>
+            <span className="underline-offset-4 group-hover:underline">Order online any time</span> · Pickup or delivery
+          </span>
+          <span className="text-euro-soft md:text-euro-ink">
+            <span className="hidden md:inline"> · </span>Open 7 days, 7am – 3pm · 974 High St
+            <span className="hidden min-[375px]:inline">, Armadale</span>
+          </span>
+        </span>
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">
+          <path d="m9 6 6 6-6 6" />
+        </svg>
+      </Link>
 
       <nav
-        className={`w-full transition-all duration-300 h-[70px] md:h-[80px] flex items-center ${
-          isHomePage && !isScrolled
-            ? "bg-transparent border-b-0 text-primary-foreground"
-            : "bg-background/80 backdrop-blur-md border-b-2 border-primary text-primary"
+        aria-label="Main"
+        className={`w-full transition-all duration-300 ${
+          overHero
+            ? "bg-transparent"
+            : "border-b border-euro-line bg-white/95 shadow-[0_6px_24px_rgba(0,0,0,0.05)] backdrop-blur"
         }`}
       >
-        <div className="w-full flex items-center justify-between px-4 md:px-8 h-full relative">
-          {/* Left side Menu Drawer */}
-          <div className="flex items-center w-[100px] md:w-[200px]">
+        <div
+          className={`relative grid grid-cols-[1fr_auto_1fr] items-center px-4 transition-all duration-300 md:px-12 ${
+            overHero ? "h-[84px] md:h-[104px]" : "h-[60px] md:h-[68px]"
+          }`}
+        >
+          {/* Left: menu drawer + primary links */}
+          <div className={`flex items-center gap-6 ${tone}`}>
             <Sheet>
               <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
+                <button
+                  type="button"
                   aria-label="Open menu"
-                  className={`group hover:bg-primary hover:text-primary-foreground border-2 border-transparent hover:border-primary rounded-none ${
-                    isHomePage && !isScrolled ? "text-primary-foreground" : "text-primary"
-                  }`}
+                  className="flex h-11 w-8 items-center transition-opacity hover:opacity-70"
                 >
-                  <div className="flex flex-col items-start justify-center w-6 h-6 gap-[6px]">
-                    <div className="w-6 h-[2px] bg-current" />
-                    <div className="w-4 h-[2px] bg-current transition-all duration-300 group-hover:w-6" />
-                  </div>
-                </Button>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4} className="h-5 w-5" aria-hidden="true">
+                    <path d="M3 9h18M3 15h12" />
+                  </svg>
+                </button>
               </SheetTrigger>
               <SheetContent
                 side="left"
-                className="w-[85vw] sm:w-[50vw] md:max-w-[400px] border-r-2 border-primary p-0 bg-background flex flex-col overflow-y-auto"
+                className="flex w-[85vw] flex-col overflow-y-auto border-r border-euro-line bg-white p-0 sm:w-[50vw] md:max-w-[400px]"
               >
                 <SheetTitle className="sr-only">Menu</SheetTitle>
-                <div className="p-6 border-b-2 border-primary flex justify-center items-center h-[80px] shrink-0">
-                  <img src={LOGO} alt="Euro Patisserie" className="h-full max-h-[40px] object-contain" />
+                <div className="flex h-[76px] shrink-0 items-center justify-center border-b border-euro-line px-6">
+                  <img src={LOGO} alt="Euro Patisserie" className="max-h-[40px] object-contain" />
                 </div>
-                <div className="flex flex-col flex-1 p-8 gap-6 items-start">
-                  <div className="flex flex-col gap-4 w-full">
-                    {primaryNavLinks.map((link, index) => (
-                      <motion.div
-                        key={link.path}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.4, delay: index * 0.1 + 0.1 }}
-                      >
-                        <SheetClose asChild>
-                          <Link
-                            href={link.path}
-                            className={`text-lg md:text-xl font-faro uppercase tracking-widest hover:text-muted-foreground transition-colors text-left block ${
-                              pathname === link.path ? "text-primary" : "text-primary/80"
-                            }`}
-                          >
-                            {link.name}
-                          </Link>
-                        </SheetClose>
-                      </motion.div>
+                <div className="flex flex-1 flex-col gap-8 p-8">
+                  <nav aria-label="Site" className="flex flex-col gap-5">
+                    {DRAWER_LINKS.map((link) => (
+                      <SheetClose asChild key={link.path}>
+                        <Link
+                          href={link.path}
+                          className={`text-[15px] font-light uppercase tracking-[0.16em] transition-colors hover:text-euro-ink ${
+                            pathname === link.path ? "text-euro-ink" : "text-euro-soft"
+                          }`}
+                        >
+                          {link.name}
+                        </Link>
+                      </SheetClose>
                     ))}
-                  </div>
+                  </nav>
 
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.4 }}
-                    className="w-full my-4"
-                  >
-                    <SheetClose asChild>
-                      <Link
-                        href="/cafe"
-                        className="group relative block aspect-square w-full overflow-hidden border-2 border-primary"
-                      >
-                        <img
-                          src={DOG_IMG}
-                          alt="We're dog friendly"
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-black/25" />
-                        <div className="absolute bottom-4 left-4">
-                          <p className="text-white text-xs font-bold tracking-widest uppercase">We&apos;re</p>
-                          <p className="text-white text-sm font-faro">Dog Friendly 🐾</p>
-                        </div>
-                      </Link>
-                    </SheetClose>
-                  </motion.div>
+                  <SheetClose asChild>
+                    <Link href="/cafe" className="group relative block aspect-square w-full overflow-hidden">
+                      <img
+                        src={DOG_IMG}
+                        alt="A dachshund in the café courtyard"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <span className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/45 to-transparent" />
+                      <span className="absolute bottom-4 left-4 text-white">
+                        <span className="block text-[11px] font-medium uppercase tracking-[0.16em]">We&apos;re</span>
+                        <span className="block text-sm font-light uppercase tracking-[0.14em]">Dog friendly</span>
+                      </span>
+                    </Link>
+                  </SheetClose>
 
-                  {/* Mobile-only social and search links */}
-                  <div className="md:hidden flex gap-4 mt-auto pt-4 border-t-2 border-primary w-full">
-                    <a
-                      aria-label="Euro Patisserie on Instagram" href="https://www.instagram.com/europatisseriearmadale/?hl=en"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-primary hover:opacity-70 transition-opacity"
-                    >
-                      <Instagram className="w-6 h-6" />
+                  <div className="mt-auto flex items-center gap-5 border-t border-euro-line pt-5 text-euro-ink">
+                    <a aria-label="Euro Patisserie on Instagram" href={INSTAGRAM} target="_blank" rel="noreferrer" className="hover:opacity-70">
+                      <Instagram className="h-5 w-5" strokeWidth={1.4} />
                     </a>
-                    <a
-                      aria-label="Euro Patisserie on TikTok" href="https://www.tiktok.com/@europatisseriearmadale"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-primary hover:opacity-70 transition-opacity"
-                    >
-                      <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                        <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.12-3.44-3.17-3.64-5.46-.22-2.39.87-4.78 2.87-6.09 1.63-1.08 3.67-1.35 5.51-.83v4.09c-.43-.1-.88-.13-1.32-.12-.76.02-1.5.38-2.04.93-.52.54-.83 1.25-.87 1.99-.05.8.21 1.59.73 2.19.51.6 1.25.96 2.03 1.01.76.05 1.53-.18 2.14-.61.6-.43 1.01-1.07 1.15-1.8.04-.2.06-.41.06-.61V0h4.08z" />
-                      </svg>
+                    <a aria-label="Euro Patisserie on TikTok" href={TIKTOK} target="_blank" rel="noreferrer" className="hover:opacity-70">
+                      <TikTokIcon className="h-5 w-5" />
                     </a>
-                    <ThemeToggle className="text-primary hover:opacity-70 transition-opacity ml-auto" />
-                    <button aria-label="Search" className="text-primary hover:opacity-70 transition-opacity ml-4">
-                      <Search className="w-6 h-6" />
-                    </button>
                   </div>
                 </div>
               </SheetContent>
             </Sheet>
-          </div>
 
-          {/* Logo - Centered */}
-          <div className="absolute left-1/2 -translate-x-1/2 h-full flex items-center py-2 z-10 pointer-events-none">
-            <Link href="/" className="h-full flex items-center justify-center pointer-events-auto">
-              <img
-                src={LOGO}
-                alt="Euro Patisserie"
-                className={`h-full max-h-[45px] md:max-h-[60px] object-contain transition-all duration-300 ${
-                  // Over the hero (home, not scrolled): white on the dark hero in light
-                  // mode; dark in dark mode (where the hero flips light).
-                  // On the solid bar: navy in light mode, white in dark mode.
-                  isHomePage && !isScrolled
-                    ? "brightness-0 invert dark:invert-0"
-                    : "brightness-0 dark:invert"
-                }`}
-              />
-            </Link>
-          </div>
-
-          {/* Right side navigation */}
-          <div className="flex items-center justify-end gap-3 md:gap-5 w-[100px] md:w-[200px]">
-            <div className="hidden md:flex items-center gap-3 md:gap-5">
-              <a
-                aria-label="Euro Patisserie on Instagram" href="https://www.instagram.com/europatisseriearmadale/?hl=en"
-                target="_blank"
-                rel="noreferrer"
-                className={`hover:opacity-70 transition-opacity ${
-                  isHomePage && !isScrolled ? "text-primary-foreground" : "text-primary"
-                }`}
-              >
-                <Instagram className="w-5 h-5 md:w-6 md:h-6" />
-              </a>
-              <a
-                aria-label="Euro Patisserie on TikTok" href="https://www.tiktok.com/@europatisseriearmadale"
-                target="_blank"
-                rel="noreferrer"
-                className={`hover:opacity-70 transition-opacity ${
-                  isHomePage && !isScrolled ? "text-primary-foreground" : "text-primary"
-                }`}
-              >
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 md:w-6 md:h-6">
-                  <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.12-3.44-3.17-3.64-5.46-.22-2.39.87-4.78 2.87-6.09 1.63-1.08 3.67-1.35 5.51-.83v4.09c-.43-.1-.88-.13-1.32-.12-.76.02-1.5.38-2.04.93-.52.54-.83 1.25-.87 1.99-.05.8.21 1.59.73 2.19.51.6 1.25.96 2.03 1.01.76.05 1.53-.18 2.14-.61.6-.43 1.01-1.07 1.15-1.8.04-.2.06-.41.06-.61V0h4.08z" />
-                </svg>
-              </a>
-              <button
-                aria-label="Search"
-                className={`hover:opacity-70 transition-opacity ${
-                  isHomePage && !isScrolled ? "text-primary-foreground" : "text-primary"
-                }`}
-              >
-                <Search className="w-5 h-5 md:w-6 md:h-6" />
-              </button>
+            <div className="hidden items-center gap-7 lg:flex">
+              {LEFT_LINKS.map((link) => (
+                <Link
+                  key={link.path}
+                  href={link.path}
+                  className="text-[12.5px] font-medium uppercase tracking-[0.1em] transition-opacity hover:opacity-70"
+                >
+                  {link.name}
+                </Link>
+              ))}
             </div>
-            <ThemeToggle
-              className={`hover:opacity-70 transition-opacity ${
-                isHomePage && !isScrolled ? "text-primary-foreground" : "text-primary"
+          </div>
+
+          {/* Centre: logo */}
+          <Link href="/" className="justify-self-center" aria-label="Euro Patisserie — home">
+            <img
+              src={LOGO}
+              alt="Euro Patisserie"
+              className={`object-contain transition-all duration-300 ${
+                overHero ? "h-[52px] brightness-0 invert md:h-[70px]" : "h-[40px] md:h-[46px]"
               }`}
             />
-            <button
-              onClick={openDrawer}
-              aria-label="Open cart"
-              className={`relative hover:opacity-70 transition-opacity ${
-                isHomePage && !isScrolled ? "text-primary-foreground" : "text-primary"
-              }`}
+          </Link>
+
+          {/* Right: café, socials, search, bag */}
+          <div className={`flex items-center justify-end gap-4 md:gap-5 ${tone}`}>
+            <Link
+              href="/cafe"
+              className="hidden text-[12.5px] font-medium uppercase tracking-[0.1em] transition-opacity hover:opacity-70 lg:block"
             >
-              <ShoppingBag className="w-5 h-5 md:w-6 md:h-6" />
+              The Café
+            </Link>
+            <a
+              aria-label="Euro Patisserie on Instagram"
+              href={INSTAGRAM}
+              target="_blank"
+              rel="noreferrer"
+              className="hidden transition-opacity hover:opacity-70 md:block"
+            >
+              <Instagram className="h-[19px] w-[19px]" strokeWidth={1.4} />
+            </a>
+            <a
+              aria-label="Euro Patisserie on TikTok"
+              href={TIKTOK}
+              target="_blank"
+              rel="noreferrer"
+              className="hidden transition-opacity hover:opacity-70 md:block"
+            >
+              <TikTokIcon className="h-[18px] w-[18px]" />
+            </a>
+            <button type="button" aria-label="Search" className="hidden transition-opacity hover:opacity-70 md:block">
+              <Search className="h-[19px] w-[19px]" strokeWidth={1.4} />
+            </button>
+            <button
+              type="button"
+              onClick={openDrawer}
+              aria-label={`Bag, ${count} ${count === 1 ? "item" : "items"}`}
+              className="relative flex h-11 w-9 items-center justify-center transition-opacity hover:opacity-70"
+            >
+              <ShoppingBag className="h-[20px] w-[20px]" strokeWidth={1.4} />
               {count > 0 && (
-                <motion.span
+                <span
                   key={count}
-                  initial={{ scale: 0.4 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 600, damping: 14 }}
-                  className="absolute -right-2 -top-2 inline-flex h-4 min-w-4 items-center justify-center bg-primary px-1 text-[10px] font-bold text-primary-foreground tabular-nums"
+                  className={`absolute right-0 top-1.5 inline-flex h-4 min-w-4 animate-[bag-pop_0.5s_ease] items-center justify-center rounded-full px-1 text-[10px] font-medium tabular-nums ${
+                    overHero ? "bg-white text-euro-ink" : "bg-euro-ink text-white"
+                  }`}
                 >
                   {count}
-                </motion.span>
+                </span>
               )}
             </button>
           </div>

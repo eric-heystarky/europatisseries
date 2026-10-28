@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Minus, Plus } from "lucide-react";
-import { AnimatedSection } from "@/components/AnimatedSection";
 
 const FAQS: { q: string; a: React.ReactNode }[] = [
   {
@@ -86,43 +84,57 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
 ];
 
 /**
- * Reusable FAQ accordion, dropped in near the bottom of every main page
- * (replaces the old standalone /faq route). Self-contained: its own heading,
- * the accordion, and a "still have a question" contact CTA.
+ * Reusable FAQ accordion (v4): the heading and a "still have a question" note on
+ * the left, a calm hairline accordion on the right. Sits at the bottom of the
+ * menu page (#faq) and the other main pages.
  */
 export function FaqSection({ className = "" }: { className?: string }) {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section className={`border-t-2 border-primary bg-background px-5 py-16 md:py-20 ${className}`}>
-      <div className="mx-auto max-w-3xl">
-        <AnimatedSection className="text-center">
-          <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Good to know</p>
-          <h2 className="mt-2 font-shorelines text-5xl leading-none md:text-6xl">FAQ</h2>
-        </AnimatedSection>
+    <section id="faq" className={`scroll-mt-[120px] border-t border-euro-line bg-white px-6 py-20 md:px-12 md:py-24 ${className}`}>
+      <div className="mx-auto grid max-w-[1180px] gap-12 md:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] md:gap-20">
+        <div className="flex flex-col gap-5">
+          <p className="euro-eyebrow text-euro-muted">Good to know</p>
+          <h2 className="euro-heading text-[clamp(24px,2.4vw,34px)] text-euro-ink">Questions</h2>
+          <p className="max-w-[320px] text-[14px] leading-[1.8] text-euro-soft">
+            Can&apos;t find what you&apos;re after? We&apos;re happy to help.
+          </p>
+          <Link href="/contact" className="btn-euro-outline mt-1 self-start text-euro-ink hover:bg-euro-ink hover:text-white">
+            Contact us
+          </Link>
+        </div>
 
-        <ul className="mt-10 divide-y-2 divide-border border-2 border-border">
+        <ul className="divide-y divide-euro-line border-y border-euro-line">
           {FAQS.map((item, i) => {
             const isOpen = open === i;
             return (
               <li key={i}>
                 <button
+                  type="button"
                   onClick={() => setOpen(isOpen ? null : i)}
                   aria-expanded={isOpen}
-                  className="flex w-full items-center justify-between gap-4 bg-card px-5 py-5 text-left transition hover:bg-primary hover:text-primary-foreground"
+                  className="group flex w-full items-center justify-between gap-6 py-5 text-left"
                 >
-                  <span className="font-serif text-lg font-semibold md:text-xl">{item.q}</span>
-                  <span className="flex-none border-2 border-current p-1">
-                    {isOpen ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                  <span className="text-[13px] font-medium uppercase tracking-[0.12em] text-euro-ink transition-opacity group-hover:opacity-70">
+                    {item.q}
                   </span>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                    aria-hidden="true"
+                    className={`flex-none text-euro-ink transition-transform duration-300 ${isOpen ? "rotate-45" : ""}`}
+                  >
+                    <path d="M12 4v16M4 12h16" />
+                  </svg>
                 </button>
-                <div
-                  className={`grid overflow-hidden transition-all duration-300 ${
-                    isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-                  }`}
-                >
-                  <div className="min-h-0">
-                    <p className="px-5 pb-6 pt-1 text-sm leading-relaxed text-muted-foreground md:text-base">
+                <div className={`grid transition-all duration-300 ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+                  <div className="min-h-0 overflow-hidden">
+                    <p className="max-w-[640px] pb-6 text-[14px] leading-[1.8] text-euro-soft [&_a]:text-euro-ink [&_strong]:font-medium [&_strong]:text-euro-text">
                       {item.a}
                     </p>
                   </div>
@@ -131,14 +143,6 @@ export function FaqSection({ className = "" }: { className?: string }) {
             );
           })}
         </ul>
-
-        <div className="mt-10 border-2 border-border bg-card p-6 text-center">
-          <p className="font-serif text-xl font-semibold uppercase tracking-wide">Still have a question?</p>
-          <p className="mt-2 text-sm text-muted-foreground">We&apos;re happy to help — get in touch.</p>
-          <Link href="/contact" className="btn-brutal mt-5 px-6 py-3 text-sm">
-            Contact Us
-          </Link>
-        </div>
       </div>
     </section>
   );
